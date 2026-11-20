@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro';
+import { sablonlar } from '../../data/sablonlar';
+---
+<Base title="Hazır iş e-postası ve dilekçe şablonları" description="Zam talebi, yan hak talebi, eğitim talebi, istifa mektubu, izin talebi ve yöneticiye geri bildirim için ücretsiz, düzenlenebilir şablonlar." aktif="/sablonlar/">
+  <section class="kap bas">
+    <span class="ust-baslik">Şablonlar</span>
+    <h1>Zor yazıları boş sayfadan başlatma</h1>
+    <p class="aciklama">Doldurulacak yerleri işaretli, kopyalayıp kullanabileceğin hazır metinler. Ücretsiz, üyelik gerektirmez.</p>
+  </section>
+  <section class="kap izgara alt-bosluk">
+    {sablonlar.map((s) => (
+      <a href={`/sablonlar/${s.slug}/`} class="kart sablon-kart">
+        <h2 class="kart-baslik">{s.ad}</h2>
+        <p>{s.aciklama}</p>
+        <span class="devam">Şablonu aç →</span>
+      </a>
+    ))}
+  </section>
+</Base>
+
+<style>
+  .bas { padding-top: 40px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 14px; }
+  @media (min-width: 768px) { .bas { padding-top: 64px; } }
+  .bas h1 { font-size: clamp(32px, 6vw, 54px); max-width: 820px; }
+  .alt-bosluk { padding-bottom: 72px; }
+  .sablon-kart { text-decoration: none; color: var(--murekkep); display: flex; flex-direction: column; gap: 10px; }
+  .sablon-kart:hover { border-color: var(--lacivert); color: var(--murekkep); }
+  .sablon-kart p { color: var(--metin-2); font-size: 16px; }
+  .kart-baslik { font-size: 22px; }
+  .devam { color: var(--vurgu); font-weight: 600; margin-top: auto; }
+</style>

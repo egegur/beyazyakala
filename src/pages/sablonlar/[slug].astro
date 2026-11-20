@@ -1,0 +1,102 @@
+---
+import Base from '../../layouts/Base.astro';
+import { sablonlar, parcala } from '../../data/sablonlar';
+
+export function getStaticPaths() {
+  return sablonlar.map((s) => ({ params: { slug: s.slug } }));
+}
+
+const { slug } = Astro.params;
+const s = sablonlar.find((x) => x.slug === slug)!;
+const duzMetin = `${s.konuEtiket}: ${s.konu}\n\n${s.metin.join('\n\n')}`;
+---
+<Base title={`${s.ad} şablonu`} description={s.aciklama} aktif="/sablonlar/">
+  <div class="kap duzen">
+    <nav class="menu" aria-label="Şablonlar">
+      <span class="etiket menu-baslik">Şablonlar</span>
+      <div class="menu-liste">
+        {sablonlar.map((x) => (
+          <a href={`/sablonlar/${x.slug}/`} aria-current={x.slug === slug ? 'page' : undefined}>{x.ad}</a>
+        ))}
+      </div>
+    </nav>
+
+    <div class="icerik">
+      <div class="yigin-kucuk">
+        <h1>{s.ad}</h1>
+        <p class="aciklama">{s.aciklama}</p>
+      </div>
+
+      <div class="belge">
+        <div class="belge-ust">
+          <span><strong>{s.konuEtiket}:</strong> {parcala(s.konu).map((p) => (p.yer ? <mark class="yer">{p.t}</mark> : p.t))}</span>
+          <button type="button" class="dugme dugme-ikincil kopyala" data-metin={duzMetin}>Metni kopyala</button>
+        </div>
+        <div class="belge-govde">
+          {s.metin.map((satir) => (
+            <p class={satir.startsWith('• ') ? 'madde' : ''}>
+              {parcala(satir).map((p) => (p.yer ? <mark class="yer">{p.t}</mark> : p.t))}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div class="izgara">
+        <div class="kart yigin-kucuk">
+          <h2 class="kucuk-baslik">Göndermeden önce</h2>
+          <ul class="liste">{s.ipuclari.map((i) => <li>{i}</li>)}</ul>
+        </div>
+        <div class="kart koyu yigin-kucuk">
+          <h2 class="kucuk-baslik">Konunun devamı</h2>
+          <p>Bu konuşmaya nasıl hazırlanacağını blogda anlattık.</p>
+          <a href={s.ilgiliBlog.link} class="dugme dugme-beyaz" style="align-self: flex-start">{s.ilgiliBlog.baslik}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.kopyala').forEach((b) => {
+    b.addEventListener('click', async () => {
+      const metin = b.dataset.metin || '';
+      try {
+        await navigator.clipboard.writeText(metin);
+        b.textContent = 'Kopyalandı';
+      } catch {
+        const t = document.createElement('textarea');
+        t.value = metin;
+        document.body.appendChild(t);
+        t.select();
+        try { document.execCommand('copy'); b.textContent = 'Kopyalandı'; } catch { b.textContent = 'Kopyalanamadı'; }
+        t.remove();
+      }
+    });
+  });
+</script>
+
+<style>
+  .duzen { display: flex; flex-wrap: wrap; gap: 32px; padding-top: 24px; padding-bottom: 72px; align-items: flex-start; }
+  .menu { flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .menu-baslik { padding: 0 4px; }
+  .menu-liste { display: flex; flex-direction: column; gap: 4px; }
+  .menu-liste a { text-decoration: none; padding: 12px; border-radius: 10px; font-size: 16px; min-height: 44px; }
+  .menu-liste a[aria-current='page'] { background: var(--lacivert); color: #fff; font-weight: 600; }
+  @media (max-width: 860px) {
+    .menu { order: 2; }
+    .menu-liste { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 8px; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+    .menu-liste a { white-space: nowrap; border: 1px solid var(--cizgi-2); border-radius: 999px; background: #fff; padding: 10px 14px; }
+    .menu { order: -1; }
+  }
+  .icerik { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+  .icerik h1 { font-size: clamp(30px, 5.6vw, 48px); }
+  .belge { background: #fff; border: 1px solid var(--cizgi); border-radius: 18px; overflow: hidden; }
+  .belge-ust { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; background: #fbfaf7; border-bottom: 1px solid var(--cizgi); font-size: 15px; color: var(--metin-2); }
+  .belge-ust .dugme { min-height: 44px; padding: 8px 14px; font-size: 15px; }
+  .belge-govde { padding: 22px 18px; display: flex; flex-direction: column; gap: 14px; font-size: 17px; line-height: 1.7; overflow-wrap: anywhere; }
+  .madde { padding-left: 8px; }
+  .kucuk-baslik { font-size: 20px; }
+  .liste { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; color: var(--metin-2); font-size: 16px; }
+  .koyu { background: var(--lacivert); border-color: var(--lacivert); color: #fff; }
+  .koyu p { color: var(--acik-mavi); }
+</style>

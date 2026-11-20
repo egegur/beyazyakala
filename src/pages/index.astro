@@ -1,0 +1,244 @@
+---
+import Base from '../layouts/Base.astro';
+import { yazilar } from '../data/blog';
+import { sablonlar } from '../data/sablonlar';
+import { SITE } from '../data/site';
+
+const sss = [
+  { q: 'Yapay zekâ koçu insan koçun yerine geçer mi?', a: 'Hayır. Hazırlık, düşünme ve pratik için yanındadır. İnsan koç ve mentor desteği Kariyer Platformu paketinde sunulacak.' },
+  { q: 'Anlattıklarım nerede saklanıyor?', a: 'Neyin hatırlanacağını sen seçeceksin; kayıt tutmadan konuşabilecek, geçmişini tek tıkla silebileceksin.' },
+  { q: 'Şirketim kullandığımı görür mü?', a: 'Hayır. Hesabın kişiseldir; şirketinle bilgi paylaşılmaz.' },
+  { q: 'Hukuki tavsiye veriyor musunuz?', a: "Hayır. Koç durumunu netleştirmene ve hazırlanmana yardım eder; hukuki konularda seni ALO 170'e veya bir avukata yönlendirir." },
+  { q: 'Ne zaman kullanabileceğim?', a: 'Koç şu anda geliştirme aşamasında; demoyu inceleyebilirsin. Ücretsiz araçlar, şablonlar ve blog yazıları bugünden açık.' }
+];
+
+const alanlar = [
+  { ad: 'Şirket beklentileri', metin: 'Rolünden yazılı ve yazılmayan beklentiler. Yeni işte ilk 90 gün planı.' },
+  { ad: 'Yöneticiyle ilişki', metin: 'Birebir görüşme hazırlığı, zor konuşma provası, mesaj tonu kontrolü, geri bildirim alma ve verme.' },
+  { ad: 'Kendini geliştirme', metin: 'Beceri açığı haritası, aylık gelişim planı. Eğitim, sertifika ve konferans talebini gerekçesi ve bütçesiyle hazırlama.' },
+  { ad: 'Yükselme', metin: 'Kazanım günlüğü, terfi dosyası, performans değerlendirmesi hazırlığı, zam görüşmesi ve yan hak pazarlığı.' },
+  { ad: 'Kariyer değişimi', metin: 'Yol haritası, CV ve LinkedIn uyarlama, ATS CV skoru, mülakat provası, iş teklifi karşılaştırma.' },
+  { ad: 'İşten çıkarılma ve ayrılık', metin: 'İlk 48 saatte yapılacaklar, kıdem tazminatı tahmini, çıkış görüşmesi ve ayrılık şartları hazırlığı, referans isteme.' },
+  { ad: 'Zorlu çalışma ortamı ve mobbing', metin: "Yaşananları tarihli ve olgusal kaydetme, İK'ya yazılı bildirim taslağı, hukuki ve psikolojik destek kaynakları." }
+];
+
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, url: SITE.url, inLanguage: 'tr-TR' },
+  {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: sss.map((s) => ({ '@type': 'Question', name: s.q, acceptedAnswer: { '@type': 'Answer', text: s.a } }))
+  }
+];
+---
+<Base title="Beyaz Yakala — Türkçe yapay zekâ kariyer koçu" jsonLd={jsonLd}>
+  <a href="/sablonlar/zam-talebi-e-postasi/" class="sezon">
+    <strong>Ocak zam dönemi yaklaşıyor.</strong>
+    <span>Zam talebini hazır şablonla, gerekçeleriyle hazırla</span>
+    <span aria-hidden="true">→</span>
+  </a>
+
+  <section class="kap kahraman">
+    <div class="yigin kahraman-metin">
+      <span class="ust-baslik">Türkçe yapay zekâ kariyer koçu</span>
+      <h1>İşteki zor konuşmaya hazırlıksız girme.</h1>
+      <p class="aciklama">Yöneticinle birebir, zam talebi, performans görüşmesi ya da işten ayrılık. Durumunu kendi cümlelerinle anlat; Beyaz Yakala ne diyeceğini, nasıl diyeceğini ve sonraki adımını seninle birlikte netleştirsin.</p>
+      <div class="sira">
+        <a href="/demo/" class="dugme dugme-ana">Demoyu dene</a>
+        <a href="#nasil" class="dugme dugme-ikincil">Nasıl çalışır?</a>
+      </div>
+      <p class="soluk kucuk">Koç; avukatın, insan koçun ya da ruh sağlığı uzmanının yerine geçmez.</p>
+    </div>
+
+    <div class="sohbet" aria-label="Örnek koç konuşması">
+      <div class="balon-kullanici">Yöneticim üzerinde aylardır çalıştığım projeyi son dakika başka birine verdi. Haftaya birebirimiz var, nasıl konuşmalıyım?</div>
+      <div class="balon-koc">
+        <div class="yigin-kucuk">
+          <span class="etiket">Anladığım</span>
+          <p>Emeğinin görünmediğini düşünüyorsun ve birebirde bunu suçlayıcı olmadan konuşmak istiyorsun.</p>
+        </div>
+        <div class="yigin-kucuk">
+          <span class="etiket">Netleştirelim</span>
+          <p>Yöneticin bu kararın gerekçesini sana açıkladı mı?</p>
+        </div>
+        <div class="sira kucuk-sira">
+          <span class="cip">Evet, kısaca</span>
+          <span class="cip">Hayır, hiç konuşmadık</span>
+        </div>
+      </div>
+      <a href="/demo/" class="sonraki-adim"><span>Sonraki adım: Birebir görüşme hazırlığı, bilgilerin dolu</span><span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <section id="nasil" class="bolum bolum-beyaz">
+    <div class="kap yigin" style="gap: 36px">
+      <h2 style="max-width: 720px">Soru yazmayı bilmen gerekmiyor. Yaşadığını anlatman yeterli.</h2>
+      <ol class="adimlar">
+        <li><span class="adim-no">1</span><h3>Anlat</h3><p>İşte olanı kendi cümlelerinle yaz: kim, ne oldu, seni ne zorluyor.</p></li>
+        <li><span class="adim-no">2</span><h3>Netleştir</h3><p>Koç durumu özetler, eksik noktayı sorar ve sana seçenekler sunar. Senden gelen bilgiyle genel öneriyi ayrı gösterir.</p></li>
+        <li><span class="adim-no">3</span><h3>Harekete geç</h3><p>Doğru araç bilgilerin dolu açılır. Öneri küçük adımlara dönüşür; istersen hatırlatma eklersin.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="alanlar" class="bolum">
+    <div class="kap yigin" style="gap: 32px">
+      <div class="yigin-kucuk" style="max-width: 760px">
+        <h2>Kariyerinin yedi zor anı, tek koç</h2>
+        <p class="aciklama">İlk günden işten ayrılığa kadar, beyaz yakanın karşılaştığı durumlar için hazır araçlar.</p>
+      </div>
+      <div class="izgara">
+        {alanlar.map((a) => (
+          <div class="kart yigin-kucuk"><h3>{a.ad}</h3><p class="soluk-metin">{a.metin}</p></div>
+        ))}
+        <a href="/demo/" class="kart kart-koyu yigin-kucuk">
+          <h3>Hangisi olduğundan emin değil misin?</h3>
+          <p>Durumunu anlat, koç doğru aracı seçsin →</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum bolum-koyu">
+    <div class="kap yigin" style="gap: 32px">
+      <div class="yigin-kucuk" style="max-width: 720px">
+        <h2>Üye olmadan kullan</h2>
+        <p class="aciklama">Ücretsiz araçlar ve hazır şablonlar herkese açık.</p>
+      </div>
+      <div class="izgara">
+        <a href="/araclar/kidem-tazminati-hesaplama/" class="arac-kart"><h3>Kıdem tazminatı hesaplayıcı</h3><p>Güncel tavanla tahmini tutarını hesapla. Sonuç bağlayıcı değildir.</p></a>
+        <a href="/araclar/mesaj-tonu-kontrolu/" class="arac-kart"><h3>Mesaj tonu kontrolü</h3><p>Mesajın nasıl algılanabileceğini gör, aynı niyeti koruyan alternatifler al.</p></a>
+        <a href="/araclar/ats-cv-kontrolu/" class="arac-kart"><h3>ATS CV ön kontrolü</h3><p>CV'nin başvuru sistemlerinden geçme ihtimaline özet bir puan.</p></a>
+      </div>
+      <div class="yigin-kucuk">
+        <h3>Hazır şablonlar</h3>
+        <div class="sira">
+          {sablonlar.map((s) => <a href={`/sablonlar/${s.slug}/`} class="cip cip-koyu">{s.ad}</a>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum">
+    <div class="kap izgara-genis" style="gap: 40px">
+      <div class="yigin">
+        <h2>Güvenebileceğin bir koç</h2>
+        <p class="aciklama">Neyin hatırlanacağına sen karar vereceksin. Bir konuşmayı kaydetmeden yapabilecek, geçmişini istediğin an silebileceksin.</p>
+      </div>
+      <div class="izgara" style="gap: 16px">
+        <div class="kart yigin-kucuk">
+          <h3>Koç ne yapar?</h3>
+          <ul class="liste"><li>Senin anlattığınla genel öneriyi ayrı gösterir.</li><li>Bilmediğini söyler, eksik bilgiyi sorar.</li><li>Somut cümle, gündem ve sonraki adım verir.</li></ul>
+        </div>
+        <div class="kart yigin-kucuk">
+          <h3>Koç ne yapmaz?</h3>
+          <ul class="liste"><li>Hukuki değerlendirme yapmaz, sonuç vaat etmez.</li><li>Maaş rakamı ya da istatistik uydurmaz.</li><li>Şirketinin iç politikalarını biliyormuş gibi davranmaz.</li></ul>
+        </div>
+        <div class="uyari-kutu" style="grid-column: 1 / -1">Kriz anında <strong>112</strong>. İş hukuku sorularında <strong>ALO 170</strong> veya bir avukat. Psikolojik yıpranmada bir ruh sağlığı uzmanı. Koç seni gerektiğinde bu kaynaklara yönlendirir.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum bolum-beyaz">
+    <div class="kap yigin" style="gap: 32px">
+      <h2>İki seviye, bir yol</h2>
+      <div class="izgara-genis">
+        <div class="paket">
+          <span class="etiket">Temel</span>
+          <h3 class="paket-ad">Kariyer Koçluğu</h3>
+          <p class="soluk-metin">Yapay zekâ koçu ve tüm temel araçlar. Ücretsiz deneme, sonra aylık abonelik.</p>
+          <a href="/fiyatlar/" class="dugme dugme-ana">Paketi incele</a>
+        </div>
+        <div class="paket paket-koyu">
+          <span class="etiket" style="color:#ffb48f">Premium</span>
+          <h3 class="paket-ad">Kariyer Platformu</h3>
+          <p>Kariyerindeki her şeyi yöneten platform: kapsamlı kariyer planı ve takibi, gerçek koç ve mentorlarla görüşmeler, uzmanla birlikte ilerleme.</p>
+          <a href="/fiyatlar/" class="dugme dugme-beyaz">Paketi incele</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum">
+    <div class="kap yigin" style="gap: 28px">
+      <div class="sira" style="justify-content: space-between; align-items: flex-end">
+        <h2>Blog</h2>
+        <a href="/blog/" style="font-weight: 600; padding: 10px 0; display: inline-block">Tüm yazılar →</a>
+      </div>
+      <div class="blog-izgara">
+        {yazilar.map((y) => (
+          <a href={`/blog/${y.slug}/`} class="blog-kart">
+            <span class="etiket">{y.fm.category}</span>
+            <span class="blog-kart-baslik">{y.fm.title.split('?')[0]}{y.fm.title.includes('?') ? '?' : ''}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum bolum-beyaz">
+    <div class="kap yigin" style="max-width: 880px; gap: 20px">
+      <h2>Sık sorulan sorular</h2>
+      <div>
+        {sss.map((s) => (
+          <details class="sss"><summary>{s.q}</summary><p>{s.a}</p></details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="son-cta">
+    <div class="kap sira" style="justify-content: space-between; gap: 20px; padding-top: 56px; padding-bottom: 56px">
+      <h2 style="max-width: 680px; color: #fff">Bir sonraki zor konuşmana bugün hazırlan.</h2>
+      <a href="/sablonlar/" class="dugme dugme-beyaz">Şablonlarla başla</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sezon { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 10px; padding: 12px 20px; background: var(--lacivert); color: #fff; text-decoration: none; font-size: 15px; text-align: center; line-height: 1.4; }
+  .sezon strong { color: #ffd9c2; font-weight: 600; }
+  .sezon:hover { color: #fff; }
+
+  .kahraman { display: grid; gap: 40px; padding-top: 40px; padding-bottom: 64px; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); align-items: center; }
+  @media (min-width: 768px) { .kahraman { padding-top: 64px; padding-bottom: 88px; gap: 56px; } }
+  .kahraman-metin { gap: 20px; }
+  .kucuk { font-size: 14px; }
+
+  .sohbet { background: #fff; border: 1px solid var(--cizgi); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 24px 60px -30px rgba(29, 43, 83, 0.35); }
+  @media (min-width: 768px) { .sohbet { padding: 26px; } }
+  .balon-kullanici { align-self: flex-end; max-width: 88%; background: var(--lacivert); color: #fff; padding: 14px 16px; border-radius: 16px 16px 4px 16px; font-size: 16px; line-height: 1.5; }
+  .balon-koc { display: flex; flex-direction: column; gap: 12px; background: var(--zemin); border-radius: 16px 16px 16px 4px; padding: 16px; font-size: 15px; }
+  .kucuk-sira { gap: 8px; }
+  .kucuk-sira .cip { font-size: 14px; min-height: 36px; }
+  .sonraki-adim { display: flex; justify-content: space-between; gap: 12px; text-decoration: none; background: var(--vurgu-zemin); color: var(--vurgu-koyu); padding: 14px 16px; border-radius: 12px; font-weight: 600; font-size: 15px; }
+
+  .adimlar { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+  .adimlar li { display: flex; flex-direction: column; gap: 10px; }
+  .adimlar p { color: var(--metin-2); }
+  .adim-no { font-family: var(--baslik); font-size: 44px; font-weight: 800; color: var(--vurgu); line-height: 1; }
+
+  .soluk-metin { color: var(--metin-2); }
+  .kart-koyu { background: var(--lacivert); border-color: var(--lacivert); color: #fff; text-decoration: none; justify-content: space-between; }
+  .kart-koyu p { color: var(--acik-mavi); }
+  .kart-koyu:hover { color: #fff; background: var(--lacivert-2); }
+
+  .arac-kart { background: var(--lacivert-2); color: #fff; text-decoration: none; border-radius: var(--yaricap); padding: 22px; display: flex; flex-direction: column; gap: 8px; }
+  .arac-kart:hover { color: #fff; background: #2f4180; }
+  .arac-kart p { color: var(--acik-mavi); font-size: 16px; }
+  .cip-koyu { background: transparent; color: #fff; border-color: #4a5a8c; }
+  .cip-koyu:hover { color: #fff; border-color: #fff; }
+
+  .liste { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; color: var(--metin-2); font-size: 16px; }
+
+  .paket { border: 1px solid var(--cizgi); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+  .paket-koyu { background: var(--murekkep); border-color: var(--murekkep); color: #fff; }
+  .paket-koyu p { color: var(--acik-mavi); }
+  .paket-ad { font-size: 28px; }
+
+  .blog-izgara { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); }
+  .blog-kart { background: #fff; border: 1px solid var(--cizgi); border-radius: 14px; padding: 20px; text-decoration: none; color: var(--murekkep); display: flex; flex-direction: column; gap: 10px; min-height: 130px; }
+  .blog-kart:hover { border-color: var(--lacivert); color: var(--murekkep); }
+  .blog-kart-baslik { font-family: var(--baslik); font-weight: 700; font-size: 20px; line-height: 1.25; }
+
+  .son-cta { background: var(--vurgu); color: #fff; }
+</style>

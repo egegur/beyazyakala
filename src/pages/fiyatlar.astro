@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Fiyatlar ve paketler" description="Beyaz Yakala paketleri: ücretsiz araçlar, Kariyer Koçluğu aboneliği ve insan koç desteği olan Kariyer Platformu." aktif="/fiyatlar/">
+  <section class="kap bas">
+    <h1>Önce dene, sonra karar ver</h1>
+    <p class="aciklama">Ücretsiz araçlar, şablonlar ve blog yazıları her zaman açık. Koç açıldığında ücretsiz deneme ile başlayacaksın.</p>
+  </section>
+
+  <section class="kap paketler">
+    <div class="paket">
+      <span class="etiket">Herkese açık</span>
+      <h2 class="ad">Ücretsiz</h2>
+      <span class="fiyat">0 ₺</span>
+      <ul>
+        <li>Kıdem tazminatı hesaplayıcı</li>
+        <li>Mesaj tonu kontrolü (günde birkaç deneme)</li>
+        <li>ATS CV ön kontrolü, özet puan</li>
+        <li>Hazır şablonlar ve blog yazıları</li>
+      </ul>
+      <a href="/araclar/" class="dugme dugme-ikincil dugme-tam">Ücretsiz araçlara git</a>
+    </div>
+
+    <div class="paket vurgulu">
+      <span class="rozet">Temel</span>
+      <h2 class="ad">Kariyer Koçluğu</h2>
+      <span class="fiyat-yakinda">Fiyat yakında açıklanacak</span>
+      <ul>
+        <li>Yapay zekâ koçu: "Durumunu anlat"</li>
+        <li>Yedi alandaki tüm araçlar</li>
+        <li>Zor konuşma ve mülakat provası</li>
+        <li>Kazanım günlüğü ve terfi dosyası</li>
+        <li>İlerleme panosu, eylem takibi, hatırlatmalar</li>
+        <li>Haftalık kontrol e-postası</li>
+        <li>Senin yönettiğin hafıza</li>
+      </ul>
+      <a href="/demo/" class="dugme dugme-ana dugme-tam">Demoyu dene</a>
+    </div>
+
+    <div class="paket koyu">
+      <span class="etiket" style="color:#ffb48f">Premium · Yakında</span>
+      <h2 class="ad">Kariyer Platformu</h2>
+      <span class="fiyat-yakinda" style="color: var(--acik-mavi)">Fiyat yakında açıklanacak</span>
+      <ul>
+        <li>Kariyer Koçluğu paketindeki her şey</li>
+        <li>Kapsamlı kariyer planı ve takibi</li>
+        <li>Gerçek koç ve mentorlarla görüşmeler</li>
+        <li>Uzman görüşmeleri</li>
+        <li>Bir insanla birlikte ilerleme</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="kap ek">
+    <div class="ek-kutu">
+      <div class="yigin-kucuk">
+        <span class="etiket" style="color: var(--vurgu-koyu)">Ek paket</span>
+        <h2 class="ek-baslik">ATS CV skoru, detaylı rapor</h2>
+        <p>Ücretsiz ön kontrolün ötesinde: ilana göre eksik anahtar kelimeler, biçim sorunları ve düzeltme önerileri. Abonelikten bağımsız satın alınacak.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum bolum-beyaz">
+    <div class="kap yigin" style="max-width: 880px">
+      <h2>Ödeme ve iptal</h2>
+      <ul class="liste">
+        <li>Google veya e-posta ile üye olacaksın.</li>
+        <li>Aboneliğini istediğin zaman hesabından iptal edebileceksin.</li>
+        <li>Hesabını tek tıkla silebileceksin; geçmişin de silinecek.</li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .bas { padding-top: 40px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 14px; text-align: center; align-items: center; }
+  @media (min-width: 768px) { .bas { padding-top: 64px; } }
+  .bas h1 { font-size: clamp(32px, 6vw, 56px); }
+  .bas .aciklama { max-width: 640px; }
+  .paketler { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); padding-bottom: 32px; align-items: stretch; }
+  .paket { background: #fff; border: 1px solid var(--cizgi); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 14px; }
+  .paket ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; color: var(--metin-2); font-size: 16px; flex-grow: 1; }
+  .vurgulu { border: 2px solid var(--vurgu); }
+  .koyu { background: var(--murekkep); border-color: var(--murekkep); color: #fff; }
+  .koyu ul { color: var(--acik-mavi); }
+  .rozet { align-self: flex-start; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: var(--vurgu); padding: 4px 10px; border-radius: 999px; }
+  .ad { font-size: 28px; }
+  .fiyat { font-family: var(--baslik); font-size: 40px; font-weight: 800; }
+  .fiyat-yakinda { font-weight: 600; color: var(--metin-2); }
+  .ek { padding-bottom: 64px; }
+  .ek-kutu { background: var(--vurgu-zemin); border-radius: 20px; padding: 26px; color: #5a2106; }
+  .ek-baslik { font-size: 24px; color: var(--murekkep); }
+  .liste { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; color: var(--metin-2); }
+</style>

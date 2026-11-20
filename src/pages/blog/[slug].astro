@@ -1,0 +1,129 @@
+---
+import Base from '../../layouts/Base.astro';
+import { yazilar, tarihYaz } from '../../data/blog';
+import { SITE } from '../../data/site';
+
+export function getStaticPaths() {
+  return yazilar.map((y) => ({ params: { slug: y.slug } }));
+}
+
+const { slug } = Astro.params;
+const yazi = yazilar.find((y) => y.slug === slug)!;
+const { fm, Content } = yazi;
+const digerleri = yazilar.filter((y) => y.slug !== slug).slice(0, 3);
+const url = `${SITE.url}/blog/${slug}/`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: fm.title,
+    description: fm.description,
+    datePublished: fm.date,
+    dateModified: fm.date,
+    inLanguage: 'tr-TR',
+    mainEntityOfPage: url,
+    image: `${SITE.url}/og/blog-${slug}.png`,
+    author: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+    publisher: { '@type': 'Organization', name: SITE.name, logo: { '@type': 'ImageObject', url: `${SITE.url}/img/logo-kare.png` } }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: fm.faq.map((s) => ({ '@type': 'Question', name: s.q, acceptedAnswer: { '@type': 'Answer', text: s.a } }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Blog', item: `${SITE.url}/blog/` },
+      { '@type': 'ListItem', position: 2, name: fm.title, item: url }
+    ]
+  }
+];
+---
+<Base title={fm.seoTitle} description={fm.description} ogImage={`/og/blog-${slug}.png`} type="article" aktif="/blog/" jsonLd={jsonLd}>
+  <div class="kap duzen">
+    <article class="makale">
+      <nav aria-label="Konum" class="konum"><a href="/blog/">Blog</a><span aria-hidden="true">/</span><span>{fm.category}</span></nav>
+      <h1>{fm.title}</h1>
+      <p class="soluk tarih">Son güncelleme: <time datetime={fm.date}>{tarihYaz(fm.date)}</time></p>
+
+      <div class="bilgi-kutu kisa">
+        <span class="etiket" style="color: var(--lacivert)">Kısa cevap</span>
+        <p>{fm.shortAnswer}</p>
+      </div>
+
+      <div class="yazi">
+        <Content />
+      </div>
+
+      <section class="sss-blok" aria-labelledby="sss-baslik">
+        <h2 id="sss-baslik">Sık sorulan sorular</h2>
+        <div>
+          {fm.faq.map((s) => (
+            <details class="sss"><summary>{s.q}</summary><p>{s.a}</p></details>
+          ))}
+        </div>
+      </section>
+
+      {fm.legal && (
+        <p class="uyari-kutu">Bu yazı genel bilgilendirme amaçlıdır, hukuki danışmanlık yerine geçmez. Rakamlar ve süreler {tarihYaz(fm.date)} itibarıyla geçerlidir. Kendi durumun için ALO 170'i arayabilir ya da bir iş hukuku avukatına danışabilirsin.</p>
+      )}
+
+      <div class="paylas">
+        <span class="etiket">Paylaş</span>
+        <div class="sira">
+          <a class="cip" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`} target="_blank" rel="noopener">LinkedIn</a>
+          <a class="cip" href={`https://wa.me/?text=${encodeURIComponent(fm.title + ' ' + url)}`} target="_blank" rel="noopener">WhatsApp</a>
+          <a class="cip" href={`https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(fm.title)}`} target="_blank" rel="noopener">X</a>
+          <button type="button" class="cip kopyala" data-url={url}>Bağlantıyı kopyala</button>
+        </div>
+      </div>
+    </article>
+
+    <aside class="yan">
+      <div class="yan-cta">
+        <h2>{fm.cta}</h2>
+        <a href={fm.ctaLink} class="dugme dugme-ana">{fm.ctaLabel}</a>
+      </div>
+      <div class="kart yigin-kucuk">
+        <span class="etiket">Diğer yazılar</span>
+        {digerleri.map((d) => <a href={`/blog/${d.slug}/`} class="diger">{d.fm.title}</a>)}
+      </div>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.kopyala').forEach((b) => {
+    b.addEventListener('click', async () => {
+      const url = b.dataset.url || location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+        b.textContent = 'Kopyalandı';
+      } catch {
+        window.prompt('Bağlantıyı kopyala:', url);
+      }
+    });
+  });
+</script>
+
+<style>
+  .duzen { display: flex; flex-wrap: wrap; gap: 48px; padding-top: 28px; padding-bottom: 72px; align-items: flex-start; }
+  .makale { flex: 999 1 600px; min-width: 0; max-width: 760px; display: flex; flex-direction: column; gap: 22px; }
+  .yan { flex: 1 1 280px; display: flex; flex-direction: column; gap: 16px; }
+  @media (min-width: 1000px) { .yan { position: sticky; top: 96px; } }
+  .konum { font-size: 14px; display: flex; gap: 8px; color: var(--soluk); }
+  .konum a { color: var(--soluk); }
+  .makale h1 { font-size: clamp(32px, 6.4vw, 54px); }
+  .tarih { font-size: 14px; margin-top: -8px; }
+  .kisa { display: flex; flex-direction: column; gap: 8px; font-size: 17px; }
+  .sss-blok { margin-top: 12px; }
+  .sss-blok h2 { font-size: clamp(24px, 4vw, 30px); margin-bottom: 6px; }
+  .paylas { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--cizgi); padding-top: 20px; }
+  .paylas button { font: inherit; font-size: 15px; cursor: pointer; }
+  .yan-cta { background: var(--lacivert); color: #fff; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .yan-cta h2 { font-size: 21px; color: #fff; }
+  .diger { font-weight: 600; text-decoration: none; padding: 8px 0; border-top: 1px solid var(--cizgi); line-height: 1.4; }
+</style>

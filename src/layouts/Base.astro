@@ -1,0 +1,197 @@
+---
+import '../styles/global.css';
+import { SITE, NAV } from '../data/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  type?: 'website' | 'article';
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+  aktif?: string;
+}
+
+const {
+  title,
+  description = SITE.description,
+  ogImage = SITE.defaultOg,
+  type = 'website',
+  jsonLd = [],
+  noindex = false,
+  aktif = ''
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogUrl = new URL(ogImage, SITE.url).href;
+const tamBaslik = title.includes(SITE.name) ? title : `${title} | ${SITE.name}`;
+
+const kurum = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.url,
+  logo: `${SITE.url}/img/logo-kare.png`
+};
+const ldListesi = [kurum, ...jsonLd];
+---
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{tamBaslik}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  {noindex && <meta name="robots" content="noindex" />}
+  <meta name="theme-color" content="#1d2b53" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="icon" href="/favicon.ico" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:locale" content="tr_TR" />
+  <meta property="og:type" content={type} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={title} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogUrl} />
+
+  {ldListesi.map((ld) => <script type="application/ld+json" set:html={JSON.stringify(ld)} />)}
+</head>
+<body>
+  <a class="atla" href="#icerik">İçeriğe geç</a>
+  <header class="ust">
+    <div class="kap ust-ic">
+      <a href="/" class="logo" aria-label="Beyaz Yakala ana sayfa">
+        <img src="/img/logo-acik.png" alt="Beyaz Yakala" width="140" height="45" />
+      </a>
+      <nav class="masa-menu" aria-label="Ana menü">
+        {NAV.map((n) => (
+          <a href={n.href} aria-current={aktif === n.href ? 'page' : undefined}>{n.label}</a>
+        ))}
+      </nav>
+      <div class="ust-sag">
+        <a href="/demo/" class="dugme dugme-ana ust-cta">Demoyu dene</a>
+        <details class="mobil-menu">
+          <summary aria-label="Menüyü aç">
+            <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="gizli">Menü</span>
+          </summary>
+          <nav class="mobil-panel" aria-label="Mobil menü">
+            {NAV.map((n) => (
+              <a href={n.href} aria-current={aktif === n.href ? 'page' : undefined}>{n.label}</a>
+            ))}
+            <a href="/demo/" class="dugme dugme-ana dugme-tam">Demoyu dene</a>
+          </nav>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="icerik">
+    <slot />
+  </main>
+
+  <footer class="alt">
+    <div class="kap alt-ic">
+      <div class="alt-marka">
+        <img src="/img/logo-koyu.png" alt="Beyaz Yakala" width="140" height="45" loading="lazy" />
+        <p>Türkçe yapay zekâ kariyer koçu. Avukatın, insan koçun veya ruh sağlığı uzmanının yerine geçmez.</p>
+      </div>
+      <nav class="alt-linkler" aria-label="Alt menü">
+        <div>
+          <a href="/araclar/">Ücretsiz araçlar</a>
+          <a href="/sablonlar/">Şablonlar</a>
+          <a href="/blog/">Blog</a>
+          <a href="/fiyatlar/">Fiyatlar</a>
+        </div>
+        <div>
+          <a href="/demo/">Demo</a>
+          <a href="/gizlilik/">Gizlilik</a>
+        </div>
+      </nav>
+    </div>
+    <div class="kap alt-not">Kriz anında 112 · İş hukuku için ALO 170 · © 2026 Beyaz Yakala</div>
+  </footer>
+
+  <script>
+    // Mobil menü: bir bağlantıya dokununca menüyü kapat (aynı sayfa içi #bağlantılar için)
+    document.querySelectorAll('.mobil-panel a').forEach((a) => {
+      a.addEventListener('click', () => {
+        const d = a.closest('details');
+        if (d) d.removeAttribute('open');
+      });
+    });
+  </script>
+</body>
+</html>
+
+<style>
+  .atla { position: absolute; left: -9999px; top: 8px; background: #fff; padding: 10px 14px; border-radius: 8px; z-index: 100; }
+  .atla:focus { left: 8px; }
+
+  .ust {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(246, 245, 241, 0.94);
+    -webkit-backdrop-filter: saturate(150%) blur(8px);
+    backdrop-filter: saturate(150%) blur(8px);
+    border-bottom: 1px solid var(--cizgi);
+    padding-top: env(safe-area-inset-top);
+  }
+  .ust-ic { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+  .logo { display: flex; align-items: center; flex-shrink: 0; }
+  .logo img { height: 40px; width: auto; }
+  .masa-menu { display: none; gap: 26px; font-size: 15px; font-weight: 500; }
+  .masa-menu a { text-decoration: none; padding: 8px 0; }
+  .masa-menu a[aria-current='page'] { color: var(--vurgu); }
+  .ust-sag { display: flex; align-items: center; gap: 10px; }
+  .ust-cta { min-height: 44px; padding: 10px 16px; font-size: 15px; }
+
+  .mobil-menu { position: static; }
+  .mobil-menu summary { list-style: none; cursor: pointer; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--cizgi-2); background: #fff; }
+  .mobil-menu summary::-webkit-details-marker { display: none; }
+  .hamburger { display: flex; flex-direction: column; gap: 5px; width: 20px; }
+  .hamburger span { display: block; height: 2px; background: var(--murekkep); border-radius: 2px; transition: transform 0.2s, opacity 0.2s; }
+  .mobil-menu[open] .hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .mobil-menu[open] .hamburger span:nth-child(2) { opacity: 0; }
+  .mobil-menu[open] .hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobil-panel {
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--zemin); border-bottom: 1px solid var(--cizgi);
+    padding: 8px 20px 20px; display: flex; flex-direction: column;
+    box-shadow: 0 20px 40px -24px rgba(21, 25, 43, 0.4);
+  }
+  .mobil-panel a:not(.dugme) { text-decoration: none; font-size: 18px; font-weight: 600; padding: 14px 4px; border-bottom: 1px solid var(--cizgi); color: var(--murekkep); }
+  .mobil-panel a[aria-current='page'] { color: var(--vurgu); }
+  .mobil-panel .dugme { margin-top: 16px; }
+
+  @media (max-width: 420px) {
+    .ust-cta { display: none; }
+  }
+  @media (min-width: 1000px) {
+    .masa-menu { display: flex; }
+    .mobil-menu { display: none; }
+    .logo img { height: 46px; }
+  }
+
+  .alt { background: var(--murekkep); color: var(--acik-mavi); padding-bottom: env(safe-area-inset-bottom); }
+  .alt-ic { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px; padding-top: 48px; padding-bottom: 32px; font-size: 15px; }
+  .alt-marka { display: flex; flex-direction: column; gap: 14px; max-width: 360px; }
+  .alt-marka img { height: 44px; width: auto; }
+  .alt-marka p { line-height: 1.6; }
+  .alt-linkler { display: flex; gap: 48px; flex-wrap: wrap; }
+  .alt-linkler div { display: flex; flex-direction: column; gap: 4px; }
+  .alt-linkler a { color: var(--acik-mavi); text-decoration: none; padding: 6px 0; }
+  .alt-linkler a:hover { color: #fff; }
+  .alt-not { padding-top: 0; padding-bottom: 28px; font-size: 14px; color: #b9c0d6; }
+</style>

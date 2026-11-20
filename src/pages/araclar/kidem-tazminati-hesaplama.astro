@@ -1,0 +1,158 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../data/site';
+
+const sss = [
+  { q: 'Kıdem tazminatı nasıl hesaplanır?', a: 'Çalışılan her tam yıl için son giydirilmiş brüt aylık ücret esas alınır; küsurat süreler oranlanır. Bir yıl için ödenecek tutar yasal tavanı aşamaz. Brüt tutardan yalnızca binde 7,59 damga vergisi kesilir.' },
+  { q: 'Giydirilmiş ücret nedir?', a: 'Brüt maaşa, düzenli ödenen yemek, yol gibi para veya parayla ölçülebilen yan ödemelerin eklenmesiyle bulunan ücrettir.' },
+  { q: '2026 kıdem tazminatı tavanı ne kadar?', a: '1 Ocak–30 Haziran 2026 döneminde 64.948,77 TL, 1 Temmuz–31 Aralık 2026 döneminde 73.729,87 TL.' },
+  { q: 'Kimler kıdem tazminatı alabilir?', a: 'Genel olarak en az bir yıl çalışmış ve iş sözleşmesi işverence haklı neden olmadan sona erdirilmiş işçiler. İstifada kural olarak hak doğmaz; kanunda sayılan istisnalar vardır.' }
+];
+
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Kıdem tazminatı hesaplayıcı', url: `${SITE.url}/araclar/kidem-tazminati-hesaplama/`, applicationCategory: 'FinanceApplication', operatingSystem: 'Web', offers: { '@type': 'Offer', price: '0', priceCurrency: 'TRY' }, inLanguage: 'tr-TR' },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: sss.map((s) => ({ '@type': 'Question', name: s.q, acceptedAnswer: { '@type': 'Answer', text: s.a } })) }
+];
+---
+<Base title="Kıdem Tazminatı Hesaplama 2026 (Güncel Tavan)" description="2026 kıdem tazminatı tavanıyla tahmini brüt ve net kıdem tazminatını ücretsiz hesapla. Sonuç bilgi amaçlıdır, bağlayıcı değildir." aktif="/araclar/" ogImage="/og/kidem.png" jsonLd={jsonLd}>
+  <div class="kap duzen">
+    <div class="sol yigin">
+      <span class="ust-baslik">Ücretsiz araç</span>
+      <h1>Kıdem tazminatı hesaplayıcı</h1>
+      <p class="aciklama">Güncel tavanla tahmini brüt ve net tutarı gör. Sonuç bilgi amaçlıdır, bağlayıcı değildir.</p>
+
+      <form class="kart yigin" id="kidem-form" novalidate>
+        <div class="iki">
+          <div class="yigin-kucuk">
+            <label for="giris">İşe giriş tarihi</label>
+            <input id="giris" name="giris" type="date" value="2021-03-15" required />
+          </div>
+          <div class="yigin-kucuk">
+            <label for="cikis">İşten çıkış tarihi</label>
+            <input id="cikis" name="cikis" type="date" value="2026-11-20" required />
+          </div>
+        </div>
+        <div class="yigin-kucuk">
+          <label for="ucret">Aylık giydirilmiş brüt ücret (₺)</label>
+          <input id="ucret" name="ucret" type="text" inputmode="decimal" value="60.000" autocomplete="off" required />
+          <span class="soluk ipucu">Brüt maaşına düzenli ödenen yemek, yol gibi yan ödemelerin aylık brüt karşılığını ekle.</span>
+        </div>
+        <button type="submit" class="dugme dugme-ana">Hesapla</button>
+      </form>
+
+      <p class="uyari-kutu">Kesin hakların sözleşmene, çalışma süresine, ayrılış nedenine ve güncel tavana göre değişebilir. Kıdem tazminatı için en az 1 yıl çalışmış olmak ve ayrılış nedeninin hak doğurması gerekir. Emin olmadığın durumda ALO 170'i ara veya bir avukata danış.</p>
+    </div>
+
+    <div class="sag">
+      <div class="kart sonuc" aria-live="polite">
+        <p class="uyari-kutu" id="uyari" hidden></p>
+        <div id="sonuc" class="yigin">
+          <div class="yigin-kucuk">
+            <span class="etiket">Tahmini net kıdem tazminatı</span>
+            <span class="buyuk" id="net">—</span>
+          </div>
+          <dl class="tablo">
+            <dt>Hizmet süresi</dt><dd id="sure">—</dd>
+            <dt>Esas alınan aylık ücret</dt><dd id="esas">—</dd>
+            <dt>Brüt kıdem tazminatı</dt><dd id="brut">—</dd>
+            <dt>Damga vergisi (binde 7,59)</dt><dd id="damga">—</dd>
+          </dl>
+          <p class="soluk kucuk" id="tavan-not"></p>
+        </div>
+        <a href="/blog/isten-cikarilirsam-haklarim-neler/" class="sonraki">İşten çıkarıldıysan: ilk 48 saatte ne yapmalısın? →</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="bolum bolum-beyaz">
+    <div class="kap yigin" style="max-width: 880px">
+      <h2>Kıdem tazminatı hakkında sık sorulanlar</h2>
+      <div>{sss.map((s) => <details class="sss"><summary>{s.q}</summary><p>{s.a}</p></details>)}</div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const TAVANLAR = [
+    { bas: '2026-01-01', son: '2026-06-30', tutar: 64948.77, donem: '1 Ocak – 30 Haziran 2026' },
+    { bas: '2026-07-01', son: '2026-12-31', tutar: 73729.87, donem: '1 Temmuz – 31 Aralık 2026' }
+  ];
+  const DAMGA = 0.00759;
+  const fmt = (n: number) => n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+  const $ = (id: string) => document.getElementById(id)!;
+
+  function sayiOku(s: string): number {
+    let t = s.replace(/\s|₺|TL/gi, '');
+    if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.');
+    else if (/\.\d{3}$/.test(t)) t = t.replace(/\./g, '');
+    return parseFloat(t);
+  }
+
+  function hesapla() {
+    const giris = ($('giris') as HTMLInputElement).value;
+    const cikis = ($('cikis') as HTMLInputElement).value;
+    const ucret = sayiOku(($('ucret') as HTMLInputElement).value);
+    const uyari = $('uyari');
+    const sonuc = $('sonuc');
+    let mesaj = '';
+    const g = new Date(giris + 'T00:00:00');
+    const c = new Date(cikis + 'T00:00:00');
+    const gun = Math.round((c.getTime() - g.getTime()) / 86400000);
+    const tv = TAVANLAR.find((t) => cikis >= t.bas && cikis <= t.son);
+    if (!giris || !cikis || isNaN(gun) || !(ucret > 0)) mesaj = 'Tarihleri ve ücretini gir.';
+    else if (gun < 0) mesaj = 'Çıkış tarihi giriş tarihinden önce olamaz.';
+    else if (gun < 365) mesaj = 'Kıdem tazminatı için en az 1 yıl çalışmış olmak gerekir. Girdiğin süre 1 yıldan kısa.';
+    else if (!tv) mesaj = 'Bu çıkış tarihi için tavan tutarı henüz sistemimizde yok. Tavan her yıl Ocak ve Temmuz aylarında güncellenir.';
+
+    if (mesaj) {
+      uyari.textContent = mesaj;
+      uyari.hidden = false;
+      sonuc.hidden = true;
+      return;
+    }
+    uyari.hidden = true;
+    sonuc.hidden = false;
+    const esas = Math.min(ucret, tv!.tutar);
+    const brut = (esas * gun) / 365;
+    const damga = brut * DAMGA;
+    const yil = Math.floor(gun / 365);
+    const kalan = gun - yil * 365;
+    const ay = Math.floor(kalan / 30);
+    const gunK = kalan - ay * 30;
+    $('net').textContent = fmt(brut - damga);
+    $('sure').textContent = `${yil} yıl ${ay} ay ${gunK} gün`;
+    $('esas').textContent = fmt(esas);
+    $('brut').textContent = fmt(brut);
+    $('damga').textContent = '− ' + fmt(damga);
+    $('tavan-not').textContent =
+      (ucret > tv!.tutar ? `Ücretin tavanı aştığı için hesap tavan (${fmt(tv!.tutar)}) üzerinden yapıldı. ` : '') +
+      `Kullanılan tavan: ${tv!.donem} için ${fmt(tv!.tutar)}.`;
+  }
+
+  $('kidem-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    hesapla();
+    // Mobilde sonuç formun altında kalır; kullanıcıyı sonuca götür
+    const kart = document.querySelector('.sonuc') as HTMLElement;
+    const r = kart.getBoundingClientRect();
+    if (r.top > window.innerHeight * 0.6) kart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  ['giris', 'cikis', 'ucret'].forEach((id) => $(id).addEventListener('change', hesapla));
+  hesapla();
+</script>
+
+<style>
+  .duzen { display: grid; gap: 32px; padding-top: 32px; padding-bottom: 64px; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); align-items: start; }
+  @media (min-width: 768px) { .duzen { padding-top: 56px; } }
+  .sol h1 { font-size: clamp(32px, 6vw, 52px); }
+  .iki { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); }
+  .ipucu { font-size: 14px; line-height: 1.5; }
+  .sonuc { display: flex; flex-direction: column; gap: 20px; }
+  .buyuk { font-family: var(--baslik); font-size: clamp(34px, 7vw, 50px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+  .tablo { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; border-top: 1px solid var(--cizgi); padding-top: 16px; font-size: 16px; }
+  .tablo dt { color: var(--metin-2); }
+  .tablo dd { margin: 0; font-weight: 600; text-align: right; }
+  .kucuk { font-size: 14px; }
+  .sonraki { display: block; text-decoration: none; background: var(--lacivert); color: #fff; padding: 16px 18px; border-radius: 12px; font-weight: 600; }
+  .sonraki:hover { color: #fff; background: var(--lacivert-2); }
+</style>

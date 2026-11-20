@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Gizlilik" description="Beyaz Yakala web sitesinin gizlilik yaklaşımı.">
+  <section class="kap metin">
+    <h1>Gizlilik</h1>
+    <p class="soluk">Son güncelleme: 20 Kasım 2026</p>
+    <p>Bu web sitesi şu anda tanıtım amaçlıdır. Sitede üyelik, form veya iletişim alanı bulunmaz; senden ad, e-posta ya da başka bir kişisel veri istemez ve toplamaz.</p>
+    <p>Sitede reklam veya izleme amaçlı çerez kullanılmaz. Yazı tipleri sitenin kendi sunucusundan yüklenir; üçüncü taraf bir hizmete istek gönderilmez.</p>
+    <p>Kıdem tazminatı hesaplayıcısına girdiğin bilgiler yalnızca kendi tarayıcında işlenir; sunucuya gönderilmez ve saklanmaz.</p>
+    <p>Site, Cloudflare altyapısında barındırılır. Cloudflare, sitenin güvenli ve hızlı çalışması için teknik bağlantı kayıtlarını (ör. IP adresi) kısa süreli olarak işleyebilir.</p>
+    <p>Koç ve üyelik açıldığında, kişisel verilerin nasıl işleneceğini anlatan KVKK aydınlatma metni bu sayfada yayımlanacaktır.</p>
+  </section>
+</Base>
+
+<style>
+  .metin { max-width: 760px; padding-top: 48px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 16px; }
+  h1 { font-size: clamp(32px, 6vw, 48px); }
+  .metin p { color: var(--metin-2); }
+</style>

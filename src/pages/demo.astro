@@ -1,0 +1,153 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Koç demosu: Durumunu anlat" description="Beyaz Yakala koçunun nasıl çalışacağını örnek bir durum üzerinden adım adım gör: anlat, netleştir, harekete geç.">
+  <section class="kap demo">
+    <p class="demo-serit">Bu bir tanıtım demosudur. Koç geliştirme aşamasında; aşağıdaki örnek konuşma ile nasıl çalışacağını görebilirsin.</p>
+
+    <div id="adim0" class="yigin">
+      <h1>Ne oluyor? Anlat.</h1>
+      <p class="aciklama">Kim, ne oldu, seni ne zorluyor? Kendi cümlelerinle yazman yeterli.</p>
+      <label class="gizli" for="durum">Durumunu anlat</label>
+      <textarea id="durum" rows="5" readonly>Yöneticim üzerinde aylardır çalıştığım projeyi son dakika başka birine verdi. Haftaya birebirimiz var, nasıl konuşmalıyım?</textarea>
+      <div class="sira" style="justify-content: space-between">
+        <span class="soluk kucuk">Demoda örnek metin kullanılıyor.</span>
+        <button type="button" class="dugme dugme-ana" id="gonder">Koça gönder</button>
+      </div>
+    </div>
+
+    <div id="adim1" class="yigin" hidden>
+      <div class="balon">Yöneticim üzerinde aylardır çalıştığım projeyi son dakika başka birine verdi. Haftaya birebirimiz var, nasıl konuşmalıyım?</div>
+      <div class="kart yigin">
+        <div class="yigin-kucuk">
+          <span class="etiket">Anladığım</span>
+          <p>Uzun süre emek verdiğin bir proje, sana danışılmadan başkasına verilmiş. Emeğinin görünmediğini düşünüyorsun ve haftaki birebirde bunu suçlayıcı olmadan konuşmak istiyorsun.</p>
+        </div>
+        <div class="sira" style="gap: 8px">
+          <span class="rozet mavi">Senin anlattığın: projenin el değiştirmesi, birebir tarihi</span>
+          <span class="rozet gri">Bilmediğim: kararın gerekçesi</span>
+        </div>
+        <div class="yigin-kucuk ayrac">
+          <span class="etiket">Netleştirelim</span>
+          <p>Yöneticin bu kararın gerekçesini sana açıkladı mı?</p>
+          <div class="sira" style="gap: 8px">
+            <button type="button" class="secim cevap">Evet, kısaca</button>
+            <button type="button" class="secim cevap">Hayır, hiç konuşmadık</button>
+            <button type="button" class="secim cevap">Emin değilim</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="adim2" class="yigin" hidden>
+      <div class="kart yigin">
+        <span class="etiket">Seçeneklerin</span>
+        <div class="secenekler">
+          <div class="secenek onerilen"><span class="kucuk vurgu">Önerim</span><strong>Birebirde merakla aç</strong><span>Önce gerekçeyi sor, sonra katkını ve beklentini söyle.</span></div>
+          <div class="secenek"><strong>Önce kısa bir not gönder</strong><span>Konuyu gündeme yazılı ekle; yöneticin hazırlıklı gelir.</span></div>
+          <div class="secenek"><strong>Şimdilik bekle, kayıt tut</strong><span>Benzer durum tekrarlarsa somut örneklerle konuşursun.</span></div>
+        </div>
+        <p class="soluk kucuk">Genel öneri: Şirketinin proje dağıtım kurallarını bilmiyorum; yöneticinin anlatacağı gerekçe planı değiştirebilir.</p>
+      </div>
+
+      <div class="kart yigin">
+        <span class="etiket">Birebir görüşme hazırlığın</span>
+        <div class="yigin-kucuk">
+          <strong>Açılış cümlen</strong>
+          <p class="alinti">"[Proje] konusunu senden duymak istedim. Kararın arkasındaki düşünceyi anlamak, bundan sonra nereye odaklanmam gerektiğini birlikte netleştirmek istiyorum."</p>
+        </div>
+        <div class="yigin-kucuk">
+          <strong>Gündem</strong>
+          <ol class="liste">
+            <li>Kararın gerekçesini dinle</li>
+            <li>Projeye katkılarını kısaca hatırlat</li>
+            <li>Önümüzdeki dönemde senden beklenenleri netleştir</li>
+            <li>Bir sonraki adımı ve tarihini birlikte belirle</li>
+          </ol>
+        </div>
+        <details class="sss" open>
+          <summary>Yöneticin "Ekip kararıydı, kişisel değil" derse</summary>
+          <p>"Anlıyorum, kişisel algılamıyorum. Benim için önemli olan, bu tür kararlarda nasıl daha görünür olabileceğim. Bunun için ne önerirsin?"</p>
+        </details>
+        <details class="sss">
+          <summary>"Sana daha önemli bir iş vereceğim" derse</summary>
+          <p>"Bunu duymak güzel. Kapsamını ve ne zaman başlayacağını konuşabilir miyiz?"</p>
+        </details>
+      </div>
+
+      <div class="kart yigin">
+        <span class="etiket">Küçük adımlar</span>
+        <ol class="liste">
+          <li>Bu projedeki katkılarını 3 madde olarak kazanım günlüğüne yaz.</li>
+          <li>Birebir gündemine "proje dağılımı ve gelecek sorumluluklarım" başlığını ekle.</li>
+          <li>Görüşmeden bir gün önce açılış cümleni prova et.</li>
+        </ol>
+        <button type="button" class="dugme dugme-ikincil" id="hatirlat" style="align-self: flex-start">Hatırlatma ekle</button>
+        <p class="soluk kucuk" id="hatirlat-not" hidden>Koç açıldığında, birebirden bir gün önce sabah hatırlatma gönderecek.</p>
+      </div>
+
+      <div class="son-kutu yigin">
+        <h2>Koç açıldığında ilk sen dene</h2>
+        <p>Şimdilik ücretsiz araçları ve şablonları kullanabilirsin.</p>
+        <div class="sira">
+          <a href="/sablonlar/yoneticiye-geri-bildirim-mesaji/" class="dugme dugme-beyaz">Şablonlara git</a>
+          <button type="button" class="dugme dugme-ikincil-koyu" id="basa">Demoyu baştan oynat</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const a0 = document.getElementById('adim0')!;
+  const a1 = document.getElementById('adim1')!;
+  const a2 = document.getElementById('adim2')!;
+  document.getElementById('gonder')!.addEventListener('click', () => {
+    a0.hidden = true; a1.hidden = false;
+    a1.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  document.querySelectorAll<HTMLButtonElement>('.cevap').forEach((b) => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.cevap').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      a2.hidden = false;
+      a2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+  document.getElementById('hatirlat')!.addEventListener('click', (e) => {
+    (e.currentTarget as HTMLButtonElement).textContent = 'Hatırlatma eklendi';
+    document.getElementById('hatirlat-not')!.hidden = false;
+  });
+  document.getElementById('basa')!.addEventListener('click', () => {
+    a0.hidden = false; a1.hidden = true; a2.hidden = true;
+    document.querySelectorAll('.cevap').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+<style>
+  .demo { max-width: 820px; padding-top: 24px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 22px; }
+  .demo-serit { background: var(--vurgu-zemin); color: #5a2106; border-radius: 12px; padding: 12px 16px; font-size: 15px; }
+  h1 { font-size: clamp(32px, 6vw, 48px); }
+  textarea[readonly] { background: #fff; font-size: 17px; }
+  .kucuk { font-size: 14px; }
+  .balon { align-self: flex-end; max-width: 88%; background: var(--lacivert); color: #fff; padding: 14px 16px; border-radius: 16px 16px 4px 16px; line-height: 1.5; font-size: 16px; }
+  .rozet { font-size: 13px; font-weight: 600; padding: 5px 10px; border-radius: 999px; }
+  .mavi { background: #e6eaf4; color: var(--lacivert); }
+  .gri { background: #f1efe8; color: var(--metin-2); }
+  .ayrac { border-top: 1px solid var(--cizgi); padding-top: 16px; }
+  .secim { font: inherit; font-size: 15px; min-height: 44px; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--cizgi-2); background: #fff; color: var(--murekkep); cursor: pointer; }
+  .secim[aria-pressed='true'] { background: var(--lacivert); color: #fff; border-color: var(--lacivert); }
+  .secenekler { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+  .secenek { border: 1px solid var(--cizgi); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; color: var(--metin-2); }
+  .secenek strong { color: var(--murekkep); font-size: 16px; }
+  .onerilen { border: 2px solid var(--vurgu); }
+  .vurgu { color: var(--vurgu); font-weight: 600; }
+  .alinti { background: var(--zemin); border-radius: 12px; padding: 14px; font-size: 17px; }
+  .liste { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+  .son-kutu { background: var(--lacivert); color: #fff; border-radius: 18px; padding: 24px; }
+  .son-kutu h2 { font-size: clamp(24px, 4vw, 30px); color: #fff; }
+  .son-kutu p { color: var(--acik-mavi); }
+  .dugme-ikincil-koyu { background: transparent; color: #fff; border-color: #4a5a8c; }
+  .dugme-ikincil-koyu:hover { color: #fff; border-color: #fff; }
+</style>

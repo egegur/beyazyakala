@@ -1,0 +1,44 @@
+---
+import Base from '../../layouts/Base.astro';
+import { yazilar, tarihYaz } from '../../data/blog';
+import { SITE } from '../../data/site';
+
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Beyaz Yakala Blog',
+  url: `${SITE.url}/blog/`,
+  inLanguage: 'tr-TR',
+  blogPost: yazilar.map((y) => ({ '@type': 'BlogPosting', headline: y.fm.title, url: `${SITE.url}/blog/${y.slug}/`, datePublished: y.fm.date }))
+}];
+---
+<Base title="Blog: Beyaz yaka kariyer rehberi" description="Zam istemekten terfi dosyasına, yan hak pazarlığından işten çıkarılınca haklarına kadar beyaz yakalılar için sade ve uygulanabilir yazılar." aktif="/blog/" jsonLd={jsonLd}>
+  <section class="kap bas">
+    <span class="ust-baslik">Blog</span>
+    <h1>İş hayatının zor anları için kısa ve uygulanabilir yazılar</h1>
+    <p class="aciklama">Her yazının başında birkaç cümlelik kısa cevap var. Acelen varsa onu oku, vaktin varsa devamını.</p>
+  </section>
+
+  <section class="kap liste">
+    {yazilar.map((y) => (
+      <a href={`/blog/${y.slug}/`} class="satir">
+        <span class="etiket">{y.fm.category} · {tarihYaz(y.fm.date)}</span>
+        <h2 class="satir-baslik">{y.fm.title}</h2>
+        <p class="satir-ozet">{y.fm.description}</p>
+        <span class="devam">Oku →</span>
+      </a>
+    ))}
+  </section>
+</Base>
+
+<style>
+  .bas { padding-top: 40px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 14px; max-width: 900px; margin-left: 0; }
+  @media (min-width: 768px) { .bas { padding-top: 64px; } }
+  .bas h1 { font-size: clamp(32px, 6vw, 54px); }
+  .liste { display: grid; gap: 16px; padding-bottom: 72px; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); }
+  .satir { background: #fff; border: 1px solid var(--cizgi); border-radius: 18px; padding: 22px; text-decoration: none; color: var(--murekkep); display: flex; flex-direction: column; gap: 10px; }
+  .satir:hover { border-color: var(--lacivert); color: var(--murekkep); }
+  .satir-baslik { font-size: clamp(22px, 3.6vw, 26px); line-height: 1.2; }
+  .satir-ozet { color: var(--metin-2); font-size: 16px; }
+  .devam { color: var(--vurgu); font-weight: 600; margin-top: auto; }
+</style>

@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base title="ATS CV ön kontrolü" description="ATS nedir, CV'n başvuru sistemlerinden neden elenebilir? Yakında açılacak ücretsiz ATS CV ön kontrolü ve bugünden uygulayabileceğin ipuçları." aktif="/araclar/">
+  <section class="kap duzen">
+    <div class="yigin">
+      <span class="ust-baslik">Ücretsiz araç · Yakında</span>
+      <h1>ATS CV ön kontrolü</h1>
+      <p class="aciklama">Pek çok şirket başvuruları önce bir aday takip sisteminden (ATS) geçirir. Bu araç, CV'nin bu sistemlerde ne kadar okunabilir olduğuna özet bir puan verecek.</p>
+      <p class="uyari-kutu">Bu araç henüz açılmadı. O zamana kadar aşağıdaki kontrolleri kendin yapabilirsin.</p>
+    </div>
+    <div class="kart yigin">
+      <h2 class="kucuk-baslik">CV'ni bugün kontrol et</h2>
+      <ol class="liste">
+        <li>Başlıkları sade tut: Deneyim, Eğitim, Beceriler.</li>
+        <li>Tablo, metin kutusu ve sütunlu düzenlerden kaçın; bazı sistemler bunları okuyamaz.</li>
+        <li>İlandaki anahtar kavramları, gerçekten sahip olduğun deneyimle eşleşiyorsa CV'nde aynı kelimelerle geçir.</li>
+        <li>Tarihleri tutarlı bir biçimde yaz (ör. 03/2022 – 11/2026).</li>
+        <li>Dosyayı ilanda istenen biçimde gönder; belirtilmemişse metin seçilebilen bir PDF genellikle güvenlidir.</li>
+      </ol>
+      <a href="/blog/terfi-dosyasi-nasil-hazirlanir/" class="sonraki">Kazanımlarını nasıl yazacağını blogda anlattık →</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .duzen { display: grid; gap: 32px; padding-top: 32px; padding-bottom: 72px; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); align-items: start; }
+  @media (min-width: 768px) { .duzen { padding-top: 56px; } }
+  h1 { font-size: clamp(32px, 6vw, 52px); }
+  .kucuk-baslik { font-size: 22px; }
+  .liste { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; color: var(--metin-2); }
+  .sonraki { display: block; text-decoration: none; background: var(--lacivert); color: #fff; padding: 16px 18px; border-radius: 12px; font-weight: 600; }
+  .sonraki:hover { color: #fff; }
+</style>

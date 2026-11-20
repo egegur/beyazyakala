@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+const araclar = [
+  { href: '/araclar/kidem-tazminati-hesaplama/', ad: 'Kıdem tazminatı hesaplayıcı', metin: 'Güncel tavanla tahmini brüt ve net kıdem tazminatını hesapla.', durum: 'Açık' },
+  { href: '/araclar/mesaj-tonu-kontrolu/', ad: 'Mesaj tonu kontrolü', metin: 'Mesajın nasıl algılanabileceğini gör, aynı niyeti koruyan alternatifler al.', durum: 'Önizleme' },
+  { href: '/araclar/ats-cv-kontrolu/', ad: 'ATS CV ön kontrolü', metin: "CV'nin başvuru sistemlerinden geçme ihtimaline özet bir puan.", durum: 'Yakında' }
+];
+---
+<Base title="Ücretsiz kariyer araçları" description="Kıdem tazminatı hesaplayıcı, mesaj tonu kontrolü ve ATS CV ön kontrolü: beyaz yakalılar için ücretsiz araçlar." aktif="/araclar/">
+  <section class="kap bas">
+    <span class="ust-baslik">Ücretsiz araçlar</span>
+    <h1>Üye olmadan kullanabileceğin araçlar</h1>
+  </section>
+  <section class="kap izgara alt-bosluk">
+    {araclar.map((a) => (
+      <a href={a.href} class="kart arac">
+        <span class={`durum ${a.durum === 'Açık' ? 'acik' : ''}`}>{a.durum}</span>
+        <h2 class="kart-baslik">{a.ad}</h2>
+        <p>{a.metin}</p>
+      </a>
+    ))}
+  </section>
+</Base>
+
+<style>
+  .bas { padding-top: 40px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 14px; }
+  @media (min-width: 768px) { .bas { padding-top: 64px; } }
+  .bas h1 { font-size: clamp(32px, 6vw, 54px); max-width: 820px; }
+  .alt-bosluk { padding-bottom: 72px; }
+  .arac { text-decoration: none; color: var(--murekkep); display: flex; flex-direction: column; gap: 10px; }
+  .arac:hover { border-color: var(--lacivert); color: var(--murekkep); }
+  .arac p { color: var(--metin-2); font-size: 16px; }
+  .kart-baslik { font-size: 22px; }
+  .durum { align-self: flex-start; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #eceae3; color: var(--metin-2); }
+  .durum.acik { background: #dff3e4; color: #1d5a2c; }
+</style>
