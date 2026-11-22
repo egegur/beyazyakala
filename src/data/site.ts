@@ -17,7 +17,7 @@ export const NAV = [
 
 // KVKK veri sorumlusu (şirket kurulana kadar gerçek kişi). Yayından önce doldurulmalı.
 export const VERI_SORUMLUSU = {
-  ad: '[VERİ SORUMLUSU AD SOYAD]',
-  eposta: '[İLETİŞİM E-POSTASI]',
+  ad: 'Beyaz Yakala',
+  eposta: 'kvkk@beyazyakala.com',
   surum: '22 Kasım 2026'
 };
