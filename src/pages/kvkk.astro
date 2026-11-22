@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import { VERI_SORUMLUSU as V } from '../data/site';
+---
+<Base title="KVKK aydınlatma metni" description="Beyaz Yakala kişisel verilerin işlenmesine ilişkin aydınlatma metni (6698 sayılı KVKK md. 10).">
+  <article class="kap metin">
+    <h1>Kişisel verilerin işlenmesine ilişkin aydınlatma metni</h1>
+    <p class="soluk">Sürüm: {V.surum}</p>
+    <p>Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun ("KVKK") 10. maddesi uyarınca, beyazyakala.com ve Beyaz Yakala koçunu kullanırken kişisel verilerinin nasıl işlendiğini anlatır.</p>
+
+    <h2>1. Veri sorumlusu</h2>
+    <p>Beyaz Yakala şu an bir şirket olarak kurulmamıştır. Veri sorumlusu: <strong>{V.ad}</strong>. İletişim: <a href={`mailto:${V.eposta}`}>{V.eposta}</a>.</p>
+
+    <h2>2. Hangi verileri işliyoruz?</h2>
+    <ul>
+      <li><strong>İletişim verisi:</strong> e-posta adresin (giriş ve bildirimler için).</li>
+      <li><strong>Hizmet içeriği:</strong> koça yazdığın mesajlar ve koçun yanıtları, profil bilgilerin (rol, sektör, deneyim süresi, şirket büyüklüğü, hedef), onayladığın notlar ve adımların.</li>
+      <li><strong>Araç girdileri:</strong> mesaj tonu ve ATS CV araçlarına yapıştırdığın metinler. Bunlar yalnızca o an değerlendirme için işlenir, veritabanımıza kaydedilmez.</li>
+      <li><strong>İşlem güvenliği verisi:</strong> oturum bilgisi, giriş kodlarının özetleri, onay tarihlerin; kötüye kullanımı önlemek için IP adresinin günlük olarak değişen, geri çevrilemez özeti (IP adresinin kendisi saklanmaz). Barındırma sağlayıcımız Cloudflare, güvenlik ve işletim amacıyla teknik bağlantı kayıtlarını işler.</li>
+    </ul>
+    <p><strong>Lütfen sağlık, din, siyasi görüş gibi özel nitelikli kişisel verilerini, TC kimlik numaranı veya başka kişilerin tam adını yazma.</strong> Koçtan yararlanmak için bunlara gerek yoktur.</p>
+
+    <h2>3. Hangi amaçlarla ve hangi hukuki sebeplerle?</h2>
+    <ul>
+      <li>Hesabını oluşturmak, giriş yapmanı sağlamak ve koçluk hizmetini sunmak (KVKK md. 5/2-c: sözleşmenin kurulması ve ifası).</li>
+      <li>Sohbet geçmişini, notlarını ve adımlarını sana tekrar gösterebilmek; senin açtığın hatırlatma ve haftalık özet e-postalarını göndermek (md. 5/2-c).</li>
+      <li>Hizmetin güvenliğini sağlamak, kötüye kullanımı ve aşırı yüklemeyi önlemek (md. 5/2-f: meşru menfaat).</li>
+      <li>Hukuki yükümlülüklerimizi yerine getirmek ve olası uyuşmazlıklarda hakkımızı korumak (md. 5/2-ç ve 5/2-e).</li>
+    </ul>
+    <p>Verilerin reklam, profilleme amaçlı pazarlama veya satış için kullanılmaz. Sitede reklam veya izleme çerezi yoktur; yalnızca girişini hatırlamak için zorunlu oturum çerezleri kullanılır.</p>
+
+    <h2>4. Verileri kimlere aktarıyoruz? (Yurt dışı aktarım dahil)</h2>
+    <p>Hizmeti sunabilmek için aşağıdaki hizmet sağlayıcılarla çalışıyoruz. Sunucuları yurt dışında olduğu için verilerin yurt dışına aktarılır:</p>
+    <ul>
+      <li><strong>Anthropic PBC (ABD):</strong> Koçun ve araçların yanıtlarını üreten yapay zekâ modeli. Mesajların ve ilgili bağlam (profilin, notların, açık adımların) yanıt üretmek için iletilir. Anthropic, API üzerinden gelen verileri en geç 30 gün içinde siler ve model eğitiminde kullanmaz; kullanım politikası ihlali şüphesiyle işaretlenen içerikleri daha uzun saklayabilir.</li>
+      <li><strong>Cloudflare, Inc. (ABD, küresel ağ):</strong> Sitenin barındırılması, veritabanı (hesap, sohbet, not ve adım kayıtların) ve güvenlik.</li>
+      <li><strong>Resend (Plus Five Five, Inc., ABD):</strong> Giriş kodu ve senin açtığın bildirim e-postalarının gönderilmesi (yalnızca e-posta adresin ve e-postanın içeriği).</li>
+    </ul>
+    <p>Bu aktarım, KVKK md. 9 kapsamında hesap açarken verdiğin <strong>açık rızaya</strong> dayanır. Açık rızanı dilediğin zaman geri alabilirsin; ancak hizmet bu sağlayıcılar olmadan çalışamadığı için rızanı geri almak hesabının silinmesi anlamına gelir. Kanunen yetkili kamu kurumlarına, yalnızca yasal zorunluluk halinde aktarım yapılabilir.</p>
+
+    <h2>5. Verileri ne kadar saklıyoruz?</h2>
+    <ul>
+      <li>Hesap, sohbet, not ve adım kayıtları: sen silene kadar. <strong>12 ay boyunca giriş yapılmayan hesaplar tüm verileriyle otomatik olarak silinir.</strong></li>
+      <li>Bir sohbeti veya notu sildiğinde: hemen silinir.</li>
+      <li>Giriş kodları: en fazla 10 dakika. Oturumlar: en fazla 30 gün.</li>
+      <li>Kötüye kullanımı önlemeye yönelik sayaçlar (IP özetleri dahil): en fazla 2 gün.</li>
+      <li>Araç metinleri: veritabanımızda hiç saklanmaz.</li>
+    </ul>
+
+    <h2>6. Toplama yöntemi</h2>
+    <p>Verilerin, site ve koç üzerinden senin girdiğin bilgilerle ve hizmet kullanılırken otomatik yollarla elektronik ortamda toplanır.</p>
+
+    <h2>7. Hakların (KVKK md. 11)</h2>
+    <p>Verilerinin işlenip işlenmediğini öğrenme, bilgi talep etme, işleme amacını öğrenme, aktarıldığı kişileri bilme, eksik veya yanlış işlenmişse düzeltilmesini, silinmesini isteme, bu işlemlerin aktarılan kişilere bildirilmesini isteme, otomatik sistemlerle analiz sonucu aleyhine bir sonuç çıkmasına itiraz etme ve kanuna aykırı işleme nedeniyle zararının giderilmesini talep etme haklarına sahipsin.</p>
+    <p>Bu hakların çoğunu <a href="/hesabim/">Hesabım</a> sayfasından doğrudan kullanabilirsin: tüm verilerini JSON olarak indirebilir, profilini ve notlarını düzeltebilir, sohbetlerini veya hesabının tamamını silebilirsin. Diğer talepler için <a href={`mailto:${V.eposta}`}>{V.eposta}</a> adresine yazabilirsin; en geç 30 gün içinde ücretsiz yanıt verilir.</p>
+
+    <h2>8. Yapay zekâ hakkında</h2>
+    <p>Koçun yanıtları yapay zekâ tarafından otomatik olarak üretilir ve hatalı olabilir. Yanıtlar hukuki, mali, tıbbi veya psikolojik danışmanlık değildir; önemli kararlardan önce bir uzmana danışmalısın.</p>
+  </article>
+</Base>
+
+<style>
+  .metin { max-width: 760px; padding-top: 48px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 14px; }
+  h1 { font-size: clamp(30px, 5.5vw, 44px); }
+  h2 { font-size: clamp(21px, 3.5vw, 26px); margin-top: 18px; }
+  .metin p, .metin li { color: var(--metin-2); }
+  .metin ul { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 8px; }
+</style>

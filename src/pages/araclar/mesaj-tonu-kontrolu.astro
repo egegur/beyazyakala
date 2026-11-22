@@ -1,13 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 ---
-<Base title="Mesaj tonu kontrolü" description="İş mesajının nasıl algılanabileceğini, bunu hangi ifadelerin etkilediğini ve aynı niyeti koruyan alternatifleri gör." aktif="/araclar/">
+<Base title="Mesaj tonu kontrolü" description="İş mesajının nasıl algılanabileceğini, bunu hangi ifadelerin etkilediğini ve aynı niyeti koruyan alternatifleri ücretsiz gör." aktif="/araclar/">
   <div class="kap duzen">
-    <div class="yigin">
-      <span class="ust-baslik">Ücretsiz araç · Önizleme</span>
+    <form class="yigin" id="form" novalidate>
+      <span class="ust-baslik">Ücretsiz araç · Beta</span>
       <h1>Mesajın nasıl okunacak?</h1>
       <p class="aciklama">Göndermeden önce mesajının nasıl algılanabileceğini, bunu hangi ifadelerin etkilediğini ve aynı niyeti koruyan alternatifleri gör.</p>
-      <p class="uyari-kutu">Bu araç yakında yapay zekâ ile çalışacak. Şimdilik örnek bir mesaj üzerinden nasıl çalışacağını görebilirsin.</p>
 
       <div class="yigin-kucuk">
         <span class="etiket-baslik" id="alici-etiket">Kime gönderiyorsun?</span>
@@ -16,59 +15,105 @@ import Base from '../../layouts/Base.astro';
           <button type="button" class="secim" data-alici="ekip" aria-pressed="true">Ekip arkadaşıma</button>
           <button type="button" class="secim" data-alici="ast" aria-pressed="false">Ekibimden birine</button>
           <button type="button" class="secim" data-alici="musteri" aria-pressed="false">Müşteriye</button>
+          <button type="button" class="secim" data-alici="ik" aria-pressed="false">İK'ya</button>
         </div>
       </div>
       <div class="yigin-kucuk">
-        <label for="mesaj">Örnek mesaj</label>
-        <textarea id="mesaj" rows="4" readonly>Bu raporu dün istemiştim, hâlâ gelmedi. Lütfen bugün bitirin.</textarea>
+        <label for="mesaj">Mesajın</label>
+        <textarea id="mesaj" rows="6" maxlength="2000" placeholder="ör. Bu raporu dün istemiştim, hâlâ gelmedi. Lütfen bugün bitirin."></textarea>
+        <span class="soluk kucuk">En fazla 2000 karakter. İsim ve şirket bilgisi yazmana gerek yok.</span>
       </div>
-    </div>
+      <p class="hata" id="hata" role="alert" hidden></p>
+      <button type="submit" class="dugme dugme-ana" id="dugme">Tonu kontrol et</button>
+      <p class="soluk kucuk">Mesajın değerlendirme için yapay zekâ hizmet sağlayıcımıza (Anthropic) iletilir; bizde saklanmaz, Anthropic en geç 30 gün içinde siler ve model eğitiminde kullanmaz. <a href="/kvkk/">Ayrıntılar</a></p>
+    </form>
 
-    <div class="kart yigin sonuc" aria-live="polite">
-      <div class="yigin-kucuk">
-        <span class="etiket">Nasıl algılanabilir</span>
-        <p class="algi"><strong id="algi-baslik">Kısa ve sert.</strong> <span id="algi-metin">Ekip arkadaşın bunu suçlama olarak okuyabilir; neden bugün lazım olduğunu söylemek gerginliği azaltır.</span></p>
+    <div class="kart yigin sonuc" id="sonuc" aria-live="polite">
+      <div class="bos-durum" id="bos">
+        <span class="etiket">Sonuç burada görünecek</span>
+        <p class="soluk">Mesajını yaz, alıcıyı seç ve "Tonu kontrol et"e dokun. Algı, dikkat çeken ifadeler ve üç alternatif gelecek.</p>
       </div>
-      <div class="yigin-kucuk">
-        <span class="etiket">Bunu etkileyen ifadeler</span>
-        <p><mark class="yer">hâlâ gelmedi</mark> Sabırsızlık ve sitem gibi okunabilir.</p>
-        <p><mark class="yer">Lütfen bugün bitirin.</mark> Gerekçesiz bir emir gibi duruyor.</p>
-      </div>
-      <div class="yigin-kucuk">
-        <span class="etiket">Aynı niyetle alternatifler</span>
-        <div class="alt">
-          <strong>Daha yumuşak</strong>
-          <p>Merhaba, dün konuştuğumuz rapor için yazıyorum. Bugün gün sonuna kadar elimde olması gerekiyor; yetişmesini zorlaştıran bir şey varsa haber verir misin?</p>
-        </div>
-        <div class="alt">
-          <strong>Net ve profesyonel</strong>
-          <p>Merhaba, rapora bugün 17.00'ye kadar ihtiyacım var çünkü [gerekçe]. Durumu kısaca paylaşabilir misin?</p>
-        </div>
-        <div class="alt">
-          <strong>Kısa</strong>
-          <p>Rapor bugün gün sonuna kadar lazım. Yetişir mi, destek gereken bir yer var mı?</p>
-        </div>
-      </div>
-      <a href="/sablonlar/yoneticiye-geri-bildirim-mesaji/" class="sonraki">Daha uzun bir mesaj mı yazacaksın? Şablonlara göz at →</a>
     </div>
   </div>
 </Base>
 
 <script>
-  const algilar: Record<string, [string, string]> = {
-    yonetici: ['Yöneticine göre fazla sert.', 'Talimat veriyormuşsun gibi okunabilir; beklentini gerekçesiyle anlatmak daha iyi sonuç verir.'],
-    ekip: ['Kısa ve sert.', 'Ekip arkadaşın bunu suçlama olarak okuyabilir; neden bugün lazım olduğunu söylemek gerginliği azaltır.'],
-    ast: ['Net ama soğuk.', 'Ekibinden biri bunu baskı olarak okuyabilir; engel olup olmadığını sormak destek verdiğini gösterir.'],
-    musteri: ['Profesyonel değil.', 'Müşteriye sitem gibi gelebilir; tarihi ve sonraki adımı nazikçe hatırlatmak daha uygun olur.']
-  };
-  document.querySelectorAll<HTMLButtonElement>('.secim').forEach((b) => {
+  import { kac } from '../../lib/istemci';
+  let alici = 'ekip';
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  document.querySelectorAll<HTMLButtonElement>('.secim').forEach((b) =>
     b.addEventListener('click', () => {
       document.querySelectorAll('.secim').forEach((x) => x.setAttribute('aria-pressed', 'false'));
       b.setAttribute('aria-pressed', 'true');
-      const a = algilar[b.dataset.alici || 'ekip'];
-      document.getElementById('algi-baslik')!.textContent = a[0];
-      document.getElementById('algi-metin')!.textContent = a[1];
-    });
+      alici = b.dataset.alici!;
+    })
+  );
+
+  function vurgula(metin: string, ifadeler: { ifade: string }[]) {
+    let h = kac(metin);
+    for (const i of ifadeler) {
+      const e = kac(i.ifade);
+      if (e && h.includes(e)) h = h.replace(e, `<mark class="yer">${e}</mark>`);
+    }
+    return h;
+  }
+
+  $('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const metin = $<HTMLTextAreaElement>('mesaj').value.trim();
+    const hata = $('hata');
+    hata.hidden = true;
+    if (metin.length < 5) {
+      hata.textContent = 'Kontrol edilecek mesajı yaz.';
+      hata.hidden = false;
+      return;
+    }
+    const d = $<HTMLButtonElement>('dugme');
+    d.disabled = true;
+    d.textContent = 'Değerlendiriliyor…';
+    $('sonuc').innerHTML = '<p class="soluk">Mesajın okunuyor…</p>';
+    try {
+      const r = await fetch('/api/arac/ton', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ metin, alici })
+      });
+      const v = await r.json();
+      if (!r.ok) throw new Error(v.hata || 'Bir hata oldu.');
+      const s = v.sonuc;
+      const ifadeler = Array.isArray(s.ifadeler) ? s.ifadeler : [];
+      const alt = Array.isArray(s.alternatifler) ? s.alternatifler : [];
+      $('sonuc').innerHTML = `
+        <div class="yigin-kucuk">
+          <span class="etiket">Nasıl algılanabilir</span>
+          <p class="algi"><strong>${kac(String(s.algi_baslik ?? ''))}</strong> ${kac(String(s.algi_metin ?? ''))}</p>
+          ${typeof s.puan === 'number' ? `<div class="puan" aria-label="Ton uygunluğu ${s.puan} / 100"><span style="width:${Math.max(0, Math.min(100, s.puan))}%"></span></div><span class="soluk kucuk">Ton uygunluğu: ${s.puan}/100</span>` : ''}
+        </div>
+        ${ifadeler.length ? `<div class="yigin-kucuk"><span class="etiket">Bunu etkileyen ifadeler</span>
+          <p class="mesaj-kopya">${vurgula(metin, ifadeler)}</p>
+          ${ifadeler.map((i: any) => `<p><mark class="yer">${kac(String(i.ifade))}</mark> ${kac(String(i.neden ?? ''))}</p>`).join('')}</div>` : ''}
+        ${alt.length ? `<div class="yigin-kucuk"><span class="etiket">Aynı niyetle alternatifler</span>
+          ${alt.map((a: any, n: number) => `<div class="alt"><div class="alt-ust"><strong>${kac(String(a.tur ?? ''))}</strong><button type="button" class="kopyala" data-n="${n}">Kopyala</button></div><p>${kac(String(a.metin ?? ''))}</p></div>`).join('')}</div>` : ''}
+        <a href="/koc/" class="sonraki">Konuşmanın tamamına hazırlanmak mı istiyorsun? Koça anlat →</a>`;
+      $('sonuc').querySelectorAll<HTMLButtonElement>('.kopyala').forEach((b) =>
+        b.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(String(alt[Number(b.dataset.n)].metin));
+            b.textContent = 'Kopyalandı';
+          } catch {
+            b.textContent = 'Kopyalanamadı';
+          }
+          setTimeout(() => (b.textContent = 'Kopyala'), 2000);
+        })
+      );
+      if (window.innerWidth < 900) $('sonuc').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      $('sonuc').innerHTML = `<p class="hata">${kac((err as Error).message)}</p>`;
+    } finally {
+      d.disabled = false;
+      d.textContent = 'Tonu kontrol et';
+    }
   });
 </script>
 
@@ -80,11 +125,19 @@ import Base from '../../layouts/Base.astro';
   .secimler { gap: 8px; }
   .secim { font: inherit; font-size: 15px; min-height: 44px; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--cizgi-2); background: #fff; color: var(--murekkep); cursor: pointer; }
   .secim[aria-pressed='true'] { background: var(--lacivert); color: #fff; border-color: var(--lacivert); }
-  textarea[readonly] { background: #fbfaf7; }
-  .algi { font-size: 18px; }
-  .sonuc p { font-size: 16px; }
-  .alt { border: 1px solid var(--cizgi); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
-  .alt strong { color: var(--lacivert); font-size: 15px; }
-  .sonraki { display: block; text-decoration: none; background: var(--lacivert); color: #fff; padding: 16px 18px; border-radius: 12px; font-weight: 600; }
-  .sonraki:hover { color: #fff; }
+  .kucuk { font-size: 14px; }
+  .hata { background: #fde8e8; color: #8a1c1c; border-radius: 10px; padding: 12px 14px; font-size: 15px; }
+  .sonuc { scroll-margin-top: 90px; }
+  .sonuc :global(.algi) { font-size: 18px; }
+  .sonuc :global(p) { font-size: 16px; }
+  .sonuc :global(.mesaj-kopya) { background: var(--zemin); border-radius: 10px; padding: 12px 14px; }
+  .sonuc :global(.puan) { height: 8px; background: #eceae3; border-radius: 99px; overflow: hidden; }
+  .sonuc :global(.puan span) { display: block; height: 100%; background: var(--lacivert); }
+  .sonuc :global(.alt) { border: 1px solid var(--cizgi); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .sonuc :global(.alt-ust) { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .sonuc :global(.alt strong) { color: var(--lacivert); font-size: 15px; }
+  .sonuc :global(.kopyala) { font: inherit; font-size: 14px; min-height: 40px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--cizgi-2); background: #fff; cursor: pointer; }
+  .sonuc :global(.sonraki) { display: block; text-decoration: none; background: var(--lacivert); color: #fff; padding: 16px 18px; border-radius: 12px; font-weight: 600; }
+  .sonuc :global(.sonraki:hover) { color: #fff; }
+  .sonuc :global(.hata) { background: #fde8e8; color: #8a1c1c; border-radius: 10px; padding: 12px 14px; }
 </style>

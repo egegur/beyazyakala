@@ -6,10 +6,10 @@ import { SITE } from '../data/site';
 
 const sss = [
   { q: 'Yapay zekâ koçu insan koçun yerine geçer mi?', a: 'Hayır. Hazırlık, düşünme ve pratik için yanındadır. İnsan koç ve mentor desteği Kariyer Platformu paketinde sunulacak.' },
-  { q: 'Anlattıklarım nerede saklanıyor?', a: 'Neyin hatırlanacağını sen seçeceksin; kayıt tutmadan konuşabilecek, geçmişini tek tıkla silebileceksin.' },
+  { q: 'Anlattıklarım nerede saklanıyor?', a: 'Sohbetlerin hesabında saklanır; koçun hangi bilgileri hatırlayacağını sen onaylarsın. Bir sohbeti, notlarını veya hesabının tamamını tek tıkla silebilir, tüm verilerini indirebilirsin.' },
   { q: 'Şirketim kullandığımı görür mü?', a: 'Hayır. Hesabın kişiseldir; şirketinle bilgi paylaşılmaz.' },
   { q: 'Hukuki tavsiye veriyor musunuz?', a: "Hayır. Koç durumunu netleştirmene ve hazırlanmana yardım eder; hukuki konularda seni ALO 170'e veya bir avukata yönlendirir." },
-  { q: 'Ne zaman kullanabileceğim?', a: 'Koç şu anda geliştirme aşamasında; demoyu inceleyebilirsin. Ücretsiz araçlar, şablonlar ve blog yazıları bugünden açık.' }
+  { q: 'Ne zaman kullanabileceğim?', a: 'Hemen. Koç ücretsiz beta olarak açık; e-posta adresinle şifresiz giriş yapman yeterli. Beta süresince günlük mesaj sınırı var. Ücretsiz araçlar, şablonlar ve blog yazıları üye olmadan da açık.' }
 ];
 
 const alanlar = [
@@ -43,7 +43,7 @@ const jsonLd = [
       <h1>İşteki zor konuşmaya hazırlıksız girme.</h1>
       <p class="aciklama">Yöneticinle birebir, zam talebi, performans görüşmesi ya da işten ayrılık. Durumunu kendi cümlelerinle anlat; Beyaz Yakala ne diyeceğini, nasıl diyeceğini ve sonraki adımını seninle birlikte netleştirsin.</p>
       <div class="sira">
-        <a href="/demo/" class="dugme dugme-ana">Demoyu dene</a>
+        <a href="/koc/" class="dugme dugme-ana">Ücretsiz dene</a>
         <a href="#nasil" class="dugme dugme-ikincil">Nasıl çalışır?</a>
       </div>
       <p class="soluk kucuk">Koç; avukatın, insan koçun ya da ruh sağlığı uzmanının yerine geçmez.</p>
@@ -65,7 +65,7 @@ const jsonLd = [
           <span class="cip">Hayır, hiç konuşmadık</span>
         </div>
       </div>
-      <a href="/demo/" class="sonraki-adim"><span>Sonraki adım: Birebir görüşme hazırlığı, bilgilerin dolu</span><span aria-hidden="true">→</span></a>
+      <a href="/koc/" class="sonraki-adim"><span>Sonraki adım: Birebir görüşme hazırlığı, bilgilerin dolu</span><span aria-hidden="true">→</span></a>
     </div>
   </section>
 
@@ -90,7 +90,7 @@ const jsonLd = [
         {alanlar.map((a) => (
           <div class="kart yigin-kucuk"><h3>{a.ad}</h3><p class="soluk-metin">{a.metin}</p></div>
         ))}
-        <a href="/demo/" class="kart kart-koyu yigin-kucuk">
+        <a href="/koc/" class="kart kart-koyu yigin-kucuk">
           <h3>Hangisi olduğundan emin değil misin?</h3>
           <p>Durumunu anlat, koç doğru aracı seçsin →</p>
         </a>

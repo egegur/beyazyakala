@@ -1,20 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
 ---
-<Base title="Gizlilik" description="Beyaz Yakala web sitesinin gizlilik yaklaşımı.">
+<Base title="Gizlilik" description="Beyaz Yakala'nın gizlilik yaklaşımı: ne saklıyoruz, ne saklamıyoruz, nasıl silersin.">
   <section class="kap metin">
     <h1>Gizlilik</h1>
-    <p class="soluk">Son güncelleme: 20 Kasım 2026</p>
-    <p>Bu web sitesi şu anda tanıtım amaçlıdır. Sitede üyelik, form veya iletişim alanı bulunmaz; senden ad, e-posta ya da başka bir kişisel veri istemez ve toplamaz.</p>
-    <p>Sitede reklam veya izleme amaçlı çerez kullanılmaz. Yazı tipleri sitenin kendi sunucusundan yüklenir; üçüncü taraf bir hizmete istek gönderilmez.</p>
-    <p>Kıdem tazminatı hesaplayıcısına girdiğin bilgiler yalnızca kendi tarayıcında işlenir; sunucuya gönderilmez ve saklanmaz.</p>
-    <p>Site, Cloudflare altyapısında barındırılır. Cloudflare, sitenin güvenli ve hızlı çalışması için teknik bağlantı kayıtlarını (ör. IP adresi) kısa süreli olarak işleyebilir.</p>
-    <p>Koç ve üyelik açıldığında, kişisel verilerin nasıl işleneceğini anlatan KVKK aydınlatma metni bu sayfada yayımlanacaktır.</p>
+    <p class="soluk">Son güncelleme: 22 Kasım 2026</p>
+    <p>Kısaca: Reklam ve izleme yok, verilerini satmıyoruz, neyin hatırlanacağına sen karar veriyorsun ve her şeyi tek tıkla silebiliyorsun. Hukuki ayrıntılar <a href="/kvkk/">KVKK aydınlatma metninde</a>.</p>
+    <h2>Üye olmadan</h2>
+    <p>Blog, şablonlar ve kıdem tazminatı hesaplayıcı hiçbir kişisel veri istemez. Kıdem hesaplayıcısına girdiğin bilgiler yalnızca kendi tarayıcında işlenir. Mesaj tonu ve ATS CV araçlarına yapıştırdığın metinler değerlendirme için yapay zekâ sağlayıcımıza iletilir, bizim tarafımızda saklanmaz.</p>
+    <h2>Koçu kullanırken</h2>
+    <p>Giriş için yalnızca e-posta adresini istiyoruz. Sohbetlerin, profilin, onayladığın notlar ve adımların hesabında saklanır ki kaldığın yerden devam edebilesin. Koç, ileride işe yarayacak bir bilgi görürse "Hatırlansın mı?" diye sorar; onaylamadığın hiçbir şey not olarak saklanmaz.</p>
+    <h2>Çerezler</h2>
+    <p>Yalnızca girişini hatırlamak için zorunlu iki çerez kullanılır. Reklam, analiz veya izleme çerezi yoktur. Yazı tipleri sitenin kendi sunucusundan yüklenir.</p>
+    <h2>Kontrol sende</h2>
+    <p><a href="/hesabim/">Hesabım</a> sayfasından tüm verilerini indirebilir, notlarını ve profilini düzenleyebilir, sohbetlerini veya hesabının tamamını silebilirsin. 12 ay giriş yapılmayan hesaplar otomatik silinir.</p>
   </section>
 </Base>
 
 <style>
-  .metin { max-width: 760px; padding-top: 48px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 16px; }
+  .metin { max-width: 760px; padding-top: 48px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 14px; }
   h1 { font-size: clamp(32px, 6vw, 48px); }
+  h2 { font-size: clamp(21px, 3.5vw, 26px); margin-top: 12px; }
   .metin p { color: var(--metin-2); }
 </style>

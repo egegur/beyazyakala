@@ -14,3 +14,10 @@ export const NAV = [
   { href: '/blog/', label: 'Blog' },
   { href: '/fiyatlar/', label: 'Fiyatlar' }
 ];
+
+// KVKK veri sorumlusu (şirket kurulana kadar gerçek kişi). Yayından önce doldurulmalı.
+export const VERI_SORUMLUSU = {
+  ad: '[VERİ SORUMLUSU AD SOYAD]',
+  eposta: '[İLETİŞİM E-POSTASI]',
+  surum: '22 Kasım 2026'
+};

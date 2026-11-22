@@ -1,10 +1,41 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "beyazyakala-site",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-11-01",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "html_handling": "force-trailing-slash"
+    "html_handling": "force-trailing-slash",
+    // Yalnızca /api/* isteklerinde Worker kodu çalışır; sayfalar doğrudan statik sunulur
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "beyazyakala",
+      "database_id": "d49093f2-9347-4520-a551-5a3b45ac6bfe"
+    }
+  ],
+  // Her gün 06.13 (TSİ): bakım + adım hatırlatmaları (pazartesi haftalık özet)
+  "triggers": { "crons": ["13 3 * * *"] },
+  "observability": { "enabled": true },
+  "vars": {
+    "MODEL_KOC": "claude-sonnet-5-5",
+    "MODEL_ARAC": "claude-haiku-5-5",
+    "ANTHROPIC_URL": "https://api.anthropic.com/v1/messages",
+    "RESEND_URL": "https://api.resend.com/emails",
+    "EPOSTA_GONDEREN": "Beyaz Yakala <koc@beyazyakala.com>",
+    "EPOSTA_YANIT": "",
+    "GUNLUK_BUTCE_USD": "3",
+    "KOC_GUNLUK_MESAJ": "25",
+    "ARAC_GUNLUK_IP": "8",
+    "FIYAT_KOC_GIRDI": "2",
+    "FIYAT_KOC_CIKTI": "10",
+    "FIYAT_ARAC_GIRDI": "1",
+    "FIYAT_ARAC_CIKTI": "5",
+    "TURNSTILE_SITE_KEY": "",
+    "GELISTIRME": "0"
   }
 }

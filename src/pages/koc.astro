@@ -1,0 +1,574 @@
+---
+import Base from '../layouts/Base.astro';
+const alanlar = [
+  ['yukselme', 'Zam ve terfi'],
+  ['yonetici', 'Yöneticimle ilişki'],
+  ['beklenti', 'Şirketin benden beklentisi'],
+  ['gelisim', 'Kendimi geliştirmek'],
+  ['degisim', 'İş / kariyer değişimi'],
+  ['ayrilik', 'İşten çıkarılma, istifa'],
+  ['zorlu', 'Zorlu ortam, mobbing']
+];
+const ornekler = [
+  'Haftaya yöneticimle birebirim var, zam istemek istiyorum. Nasıl açayım?',
+  'Bana söz verilen terfi iki dönemdir ertelendi. Ne yapmalıyım?',
+  'İşten çıkarılacağımı duydum. Haklarımı nasıl korurum?'
+];
+---
+<Base title="Koçun" description="Beyaz Yakala yapay zekâ kariyer koçu." noindex altYok aktif="/koc/">
+  <div class="sekmeler" role="tablist" aria-label="Koç bölümleri">
+    <button type="button" role="tab" data-sekme="orta" aria-selected="true">Sohbet</button>
+    <button type="button" role="tab" data-sekme="gecmis" aria-selected="false">Geçmiş</button>
+    <button type="button" role="tab" data-sekme="adimlar" aria-selected="false">Adımlarım <span class="sayac" id="adim-sayac"></span></button>
+  </div>
+
+  <div class="uygulama" id="uygulama" data-gorunen="orta">
+    <aside class="panel gecmis" aria-label="Sohbet geçmişi">
+      <div class="panel-ust">
+        <h2>Sohbetlerin</h2>
+        <button type="button" class="dugme dugme-ikincil kucuk-dugme" id="yeni-sohbet">+ Yeni</button>
+      </div>
+      <ul class="sohbet-listesi" id="sohbet-listesi"><li class="soluk bos">Yükleniyor…</li></ul>
+      <a href="/hesabim/" class="hesap-baglanti">Hesabım, profilim ve notlarım →</a>
+    </aside>
+
+    <section class="orta" aria-label="Koçla sohbet">
+      <p class="serit" id="serit">Beta · Koç bir yapay zekâdır; avukat, insan koç veya ruh sağlığı uzmanının yerine geçmez. <span id="kalan"></span></p>
+      <p class="uyari-kutu" id="bakim" hidden>Koç şu an bakımda. Kısa süre içinde tekrar açılacak; geçmişin ve adımların kayıtlı.</p>
+
+      <div id="karsilama" class="karsilama yigin">
+        <p class="hosgeldin bilgi-kutu" id="hosgeldin" hidden>Hoş geldin! Daha iyi öneriler için <a href="/hesabim/">profilini</a> 1 dakikada doldurabilirsin. İstersen doğrudan anlatmaya başla.</p>
+        <h1>Ne oluyor? Anlat.</h1>
+        <p class="aciklama">Kim, ne oldu, seni ne zorluyor? Kendi cümlelerinle yazman yeterli. Önce bir konu seçebilirsin.</p>
+        <div class="sira alanlar" role="group" aria-label="Konu seç (isteğe bağlı)">
+          {alanlar.map(([k, ad]) => <button type="button" class="secim" data-alan={k} aria-pressed="false">{ad}</button>)}
+        </div>
+        <div class="yigin-kucuk">
+          <span class="etiket">Örnekler</span>
+          {ornekler.map((o) => <button type="button" class="ornek" data-ornek={o}>{o}</button>)}
+        </div>
+      </div>
+
+      <div id="mesajlar" class="mesajlar" aria-live="polite"></div>
+
+      <form id="yazma" class="yazma" novalidate>
+        <label for="girdi" class="gizli">Mesajın</label>
+        <textarea id="girdi" rows="1" maxlength="4000" placeholder="Durumunu yaz…" enterkeyhint="send"></textarea>
+        <button type="submit" class="dugme dugme-ana gonder" id="gonder" aria-label="Gönder">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.4 20.4 21.85 12.4a.5.5 0 0 0 0-.9L3.4 3.6a.5.5 0 0 0-.7.6L5 11l9 1-9 1-2.3 6.8a.5.5 0 0 0 .7.6z"/></svg>
+        </button>
+      </form>
+      <p class="sayac-metin soluk" id="karakter" hidden></p>
+    </section>
+
+    <aside class="panel adimlar-panel" aria-label="Adımlarım">
+      <div class="panel-ust">
+        <h2>Adımlarım</h2>
+      </div>
+      <form id="adim-form" class="adim-form">
+        <label for="adim-girdi" class="gizli">Yeni adım</label>
+        <input type="text" id="adim-girdi" maxlength="200" placeholder="Yeni adım ekle" />
+        <button type="submit" class="dugme dugme-ikincil kucuk-dugme">Ekle</button>
+      </form>
+      <ul class="adim-listesi" id="adim-listesi"><li class="soluk bos">Yükleniyor…</li></ul>
+      <p class="soluk kucuk">Bir adıma tarih verirsen ve <a href="/hesabim/">hatırlatmaları</a> açarsan o sabah e-posta gönderiz.</p>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  import { api, ApiHatasi, girisSayfasinaGit, kac, markdown, tarihYaz, bugunTr } from '../lib/istemci';
+
+  type Ek = { adimlar: string[]; hafiza: string[] };
+  type Adim = { id: string; sohbet_id: string | null; metin: string; tarih: string | null; durum: 'acik' | 'tamam' };
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const girdi = $<HTMLTextAreaElement>('girdi');
+  const mesajlarEl = $('mesajlar');
+  const karsilama = $('karsilama');
+  const gonderDugme = $<HTMLButtonElement>('gonder');
+
+  let sohbetId: string | null = null;
+  let alan: string | null = null;
+  let mesgul = false;
+  let adimlar: Adim[] = [];
+
+  if (!document.cookie.split(';').some((c) => c.trim() === 'by_g=1')) girisSayfasinaGit();
+
+  /* ---------- Sekmeler (mobil) ---------- */
+  document.querySelectorAll<HTMLButtonElement>('[data-sekme]').forEach((b) =>
+    b.addEventListener('click', () => sekmeAc(b.dataset.sekme!))
+  );
+  function sekmeAc(ad: string) {
+    $('uygulama').dataset.gorunen = ad;
+    document.querySelectorAll('[data-sekme]').forEach((x) => x.setAttribute('aria-selected', String((x as HTMLElement).dataset.sekme === ad)));
+    window.scrollTo({ top: 0 });
+  }
+
+  /* ---------- Başlangıç ---------- */
+  async function basla() {
+    try {
+      const [ben, durum] = await Promise.all([api('/api/ben'), api('/api/durum')]);
+      kalanYaz(ben.kalan);
+      if (!durum.koc) $('bakim').hidden = false;
+    } catch (e) {
+      if (e instanceof ApiHatasi && e.durum === 401) return;
+    }
+    if (new URLSearchParams(location.search).get('hosgeldin')) $('hosgeldin').hidden = false;
+    sohbetleriYukle();
+    adimlariYukle();
+    const s = new URLSearchParams(location.search).get('s');
+    if (s && /^[a-f0-9]{32}$/.test(s)) sohbetAc(s);
+  }
+
+  function kalanYaz(n: number) {
+    $('kalan').textContent = `Bugün kalan mesaj hakkın: ${n}.`;
+  }
+
+  /* ---------- Sohbet listesi ---------- */
+  async function sohbetleriYukle() {
+    const ul = $('sohbet-listesi');
+    try {
+      const { sohbetler } = await api<{ sohbetler: { id: string; baslik: string; guncelleme: number }[] }>('/api/sohbetler');
+      if (!sohbetler.length) {
+        ul.innerHTML = '<li class="soluk bos">Henüz sohbetin yok.</li>';
+        return;
+      }
+      ul.innerHTML = sohbetler
+        .map(
+          (s) => `<li class="${s.id === sohbetId ? 'secili' : ''}"><button type="button" class="sohbet-ac" data-id="${s.id}">
+            <span>${kac(s.baslik)}</span><small>${tarihYaz(s.guncelleme)}</small></button>
+            <button type="button" class="sil" data-sil="${s.id}" aria-label="Sohbeti sil">×</button></li>`
+        )
+        .join('');
+    } catch {
+      ul.innerHTML = '<li class="soluk bos">Liste yüklenemedi.</li>';
+    }
+  }
+
+  $('sohbet-listesi').addEventListener('click', async (e) => {
+    const t = e.target as HTMLElement;
+    const ac = t.closest<HTMLElement>('.sohbet-ac');
+    const sil = t.closest<HTMLElement>('[data-sil]');
+    if (ac) {
+      await sohbetAc(ac.dataset.id!);
+      sekmeAc('orta');
+    } else if (sil) {
+      if (!confirm('Bu sohbet kalıcı olarak silinsin mi?')) return;
+      try {
+        await api(`/api/sohbetler/${sil.dataset.sil}`, 'DELETE');
+        if (sil.dataset.sil === sohbetId) yeniSohbet();
+        sohbetleriYukle();
+      } catch (err) {
+        alert(err instanceof ApiHatasi ? err.mesaj : 'Silinemedi.');
+      }
+    }
+  });
+
+  $('yeni-sohbet').addEventListener('click', () => {
+    yeniSohbet();
+    sekmeAc('orta');
+  });
+
+  function yeniSohbet() {
+    sohbetId = null;
+    alan = null;
+    mesajlarEl.innerHTML = '';
+    karsilama.hidden = false;
+    document.querySelectorAll('.alanlar .secim').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+    history.replaceState(null, '', '/koc/');
+    sohbetleriYukle();
+    girdi.focus();
+  }
+
+  async function sohbetAc(id: string) {
+    try {
+      const v = await api<{ mesajlar: { rol: string; metin: string; ek: Ek | null }[] }>(`/api/sohbetler/${id}`);
+      sohbetId = id;
+      history.replaceState(null, '', `/koc/?s=${id}`);
+      karsilama.hidden = true;
+      mesajlarEl.innerHTML = '';
+      for (const m of v.mesajlar) {
+        if (m.rol === 'user') kullaniciBalonu(m.metin);
+        else {
+          const el = kocBalonu();
+          el.querySelector('.icerik')!.innerHTML = markdown(m.metin);
+          if (m.ek) ekGoster(el, m.ek);
+        }
+      }
+      sohbetleriYukle();
+      requestAnimationFrame(() => mesajlarEl.lastElementChild?.scrollIntoView({ block: 'start' }));
+    } catch (e) {
+      alert(e instanceof ApiHatasi ? e.mesaj : 'Sohbet açılamadı.');
+    }
+  }
+
+  /* ---------- Balonlar ---------- */
+  function kullaniciBalonu(metin: string) {
+    const d = document.createElement('div');
+    d.className = 'balon kullanici';
+    d.textContent = metin;
+    mesajlarEl.appendChild(d);
+    return d;
+  }
+  function kocBalonu() {
+    const d = document.createElement('div');
+    d.className = 'balon koc';
+    d.innerHTML = '<div class="icerik yazi-koc"></div>';
+    mesajlarEl.appendChild(d);
+    return d;
+  }
+
+  function ekGoster(balon: HTMLElement, ek: Ek) {
+    const kutu = document.createElement('div');
+    kutu.className = 'ek';
+    if (ek.adimlar?.length) {
+      kutu.insertAdjacentHTML('beforeend', '<span class="etiket">Takibe al</span>');
+      for (const a of ek.adimlar) {
+        const var_ = adimlar.some((x) => x.metin === a);
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'oneri-adim';
+        b.disabled = var_;
+        b.textContent = (var_ ? '✓ ' : '+ ') + a;
+        b.addEventListener('click', async () => {
+          b.disabled = true;
+          try {
+            await api('/api/adimlar', 'POST', { metin: a, sohbetId });
+            b.textContent = '✓ ' + a;
+            adimlariYukle();
+          } catch (e) {
+            b.disabled = false;
+            alert(e instanceof ApiHatasi ? e.mesaj : 'Eklenemedi.');
+          }
+        });
+        kutu.appendChild(b);
+      }
+    }
+    if (ek.hafiza?.length) {
+      for (const h of ek.hafiza) {
+        const satir = document.createElement('div');
+        satir.className = 'hafiza-oneri';
+        satir.innerHTML = `<span><span class="etiket">Hatırlansın mı?</span> ${kac(h)}</span>`;
+        const evet = document.createElement('button');
+        evet.type = 'button';
+        evet.className = 'kucuk-secim';
+        evet.textContent = 'Evet, hatırla';
+        const hayir = document.createElement('button');
+        hayir.type = 'button';
+        hayir.className = 'kucuk-secim';
+        hayir.textContent = 'Gerek yok';
+        evet.addEventListener('click', async () => {
+          try {
+            await api('/api/hafiza', 'POST', { metin: h });
+            satir.innerHTML = `<span class="soluk">✓ Not kaydedildi. <a href="/hesabim/#hafiza">Notlarını yönet</a></span>`;
+          } catch (e) {
+            alert(e instanceof ApiHatasi ? e.mesaj : 'Kaydedilemedi.');
+          }
+        });
+        hayir.addEventListener('click', () => satir.remove());
+        const dugmeler = document.createElement('span');
+        dugmeler.className = 'sira';
+        dugmeler.append(evet, hayir);
+        satir.appendChild(dugmeler);
+        kutu.appendChild(satir);
+      }
+    }
+    if (kutu.childElementCount) balon.appendChild(kutu);
+  }
+
+  /* ---------- Gönderme ---------- */
+  document.querySelectorAll<HTMLButtonElement>('.alanlar .secim').forEach((b) =>
+    b.addEventListener('click', () => {
+      const secili = b.getAttribute('aria-pressed') === 'true';
+      document.querySelectorAll('.alanlar .secim').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', String(!secili));
+      alan = secili ? null : b.dataset.alan!;
+      girdi.focus();
+    })
+  );
+  document.querySelectorAll<HTMLButtonElement>('.ornek').forEach((b) =>
+    b.addEventListener('click', () => {
+      girdi.value = b.dataset.ornek!;
+      boyutla();
+      girdi.focus();
+    })
+  );
+
+  function boyutla() {
+    girdi.style.height = 'auto';
+    girdi.style.height = Math.min(girdi.scrollHeight, 220) + 'px';
+    const n = girdi.value.length;
+    const k = $('karakter');
+    k.hidden = n < 3000;
+    k.textContent = `${n} / 4000`;
+  }
+  girdi.addEventListener('input', boyutla);
+  girdi.addEventListener('keydown', (e) => {
+    // Masaüstünde Enter gönderir, Shift+Enter yeni satır; dokunmatikte Enter yeni satırdır
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(pointer: fine)').matches) {
+      e.preventDefault();
+      $('yazma').dispatchEvent(new Event('submit', { cancelable: true }));
+    }
+  });
+
+  $('yazma').addEventListener('submit', (e) => {
+    e.preventDefault();
+    gonder();
+  });
+
+  async function gonder() {
+    const metin = girdi.value.trim();
+    if (!metin || mesgul) return;
+    mesgul = true;
+    gonderDugme.disabled = true;
+    karsilama.hidden = true;
+    kullaniciBalonu(metin);
+    girdi.value = '';
+    boyutla();
+    const balon = kocBalonu();
+    const icerik = balon.querySelector<HTMLElement>('.icerik')!;
+    icerik.innerHTML = '<span class="yaziyor" aria-label="Koç yazıyor"><i></i><i></i><i></i></span>';
+    balon.scrollIntoView({ block: 'start', behavior: 'smooth' });
+
+    let tam = '';
+    let cizimBekliyor = false;
+    const ciz = () => {
+      cizimBekliyor = false;
+      icerik.innerHTML = markdown(tam);
+    };
+    try {
+      const r = await fetch('/api/sohbet', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ sohbetId, alan, metin })
+      });
+      if (!r.ok || !r.body) {
+        let m = 'Bir hata oldu. Tekrar dene.';
+        try {
+          const v = await r.json();
+          m = v.hata || m;
+          if (r.status === 401) return girisSayfasinaGit();
+        } catch {}
+        throw new Error(m);
+      }
+      const okuyucu = r.body.pipeThrough(new TextDecoderStream()).getReader();
+      let tampon = '';
+      let sonOlay: any = null;
+      for (;;) {
+        const { done, value } = await okuyucu.read();
+        if (done) break;
+        tampon += value;
+        let i: number;
+        while ((i = tampon.indexOf('\n\n')) !== -1) {
+          const satir = tampon.slice(0, i);
+          tampon = tampon.slice(i + 2);
+          if (!satir.startsWith('data: ')) continue;
+          const v = JSON.parse(satir.slice(6));
+          if (v.sohbetId) {
+            const yeni = !sohbetId;
+            sohbetId = v.sohbetId;
+            history.replaceState(null, '', `/koc/?s=${sohbetId}`);
+            if (yeni) sohbetleriYukle();
+          } else if (v.t) {
+            tam += v.t;
+            if (!cizimBekliyor) {
+              cizimBekliyor = true;
+              requestAnimationFrame(ciz);
+            }
+          } else if (v.hata) {
+            throw new Error(v.hata);
+          } else if (v.son) {
+            sonOlay = v;
+          }
+        }
+      }
+      ciz();
+      if (!sonOlay) throw new Error('Bağlantı yarıda kesildi. Sohbeti yenileyip tekrar dene.');
+      if (sonOlay.kesik) icerik.insertAdjacentHTML('beforeend', '<p class="soluk kucuk">Yanıt uzunluk sınırına takıldı. "Devam et" yazabilirsin.</p>');
+      ekGoster(balon, sonOlay.ek);
+      if (typeof sonOlay.kalan === 'number') kalanYaz(sonOlay.kalan);
+    } catch (e) {
+      if (!tam) balon.remove();
+      const h = document.createElement('p');
+      h.className = 'hata-balon';
+      h.textContent = (e as Error).message || 'Bir hata oldu.';
+      mesajlarEl.appendChild(h);
+      if (!tam) girdi.value = metin;
+      boyutla();
+    } finally {
+      mesgul = false;
+      gonderDugme.disabled = false;
+    }
+  }
+
+  /* ---------- Adımlar ---------- */
+  async function adimlariYukle() {
+    try {
+      adimlar = (await api<{ adimlar: Adim[] }>('/api/adimlar')).adimlar;
+      adimlariCiz();
+    } catch {
+      $('adim-listesi').innerHTML = '<li class="soluk bos">Adımlar yüklenemedi.</li>';
+    }
+  }
+
+  function adimlariCiz() {
+    const acik = adimlar.filter((a) => a.durum === 'acik').length;
+    $('adim-sayac').textContent = acik ? String(acik) : '';
+    const ul = $('adim-listesi');
+    if (!adimlar.length) {
+      ul.innerHTML = '<li class="soluk bos">Henüz adımın yok. Koçun önerdiği adımları "+" ile buraya ekleyebilirsin.</li>';
+      return;
+    }
+    const bugun = bugunTr();
+    ul.innerHTML = adimlar
+      .map(
+        (a) => `<li class="adim ${a.durum === 'tamam' ? 'bitti' : ''}" data-id="${a.id}">
+          <label class="adim-onay"><input type="checkbox" ${a.durum === 'tamam' ? 'checked' : ''} data-tik /><span>${kac(a.metin)}</span></label>
+          <div class="adim-alt">
+            <label class="tarih-etiket"><span class="gizli">Tarih</span><input type="date" value="${a.tarih ?? ''}" min="${bugun}" data-tarih /></label>
+            ${a.tarih && a.tarih < bugun && a.durum === 'acik' ? '<span class="gecikti">Tarihi geçti</span>' : ''}
+            <button type="button" class="sil" data-adim-sil aria-label="Adımı sil">×</button>
+          </div></li>`
+      )
+      .join('');
+  }
+
+  $('adim-listesi').addEventListener('change', async (e) => {
+    const t = e.target as HTMLInputElement;
+    const li = t.closest<HTMLElement>('li[data-id]');
+    if (!li) return;
+    const id = li.dataset.id!;
+    try {
+      if (t.matches('[data-tik]')) await api(`/api/adimlar/${id}`, 'PATCH', { durum: t.checked ? 'tamam' : 'acik' });
+      if (t.matches('[data-tarih]')) await api(`/api/adimlar/${id}`, 'PATCH', { tarih: t.value || null });
+      await adimlariYukle();
+    } catch (err) {
+      alert(err instanceof ApiHatasi ? err.mesaj : 'Kaydedilemedi.');
+    }
+  });
+  $('adim-listesi').addEventListener('click', async (e) => {
+    const b = (e.target as HTMLElement).closest('[data-adim-sil]');
+    if (!b) return;
+    const id = b.closest<HTMLElement>('li[data-id]')!.dataset.id!;
+    try {
+      await api(`/api/adimlar/${id}`, 'DELETE');
+      await adimlariYukle();
+    } catch (err) {
+      alert(err instanceof ApiHatasi ? err.mesaj : 'Silinemedi.');
+    }
+  });
+  $('adim-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const g = $<HTMLInputElement>('adim-girdi');
+    const metin = g.value.trim();
+    if (!metin) return;
+    try {
+      await api('/api/adimlar', 'POST', { metin });
+      g.value = '';
+      await adimlariYukle();
+    } catch (err) {
+      alert(err instanceof ApiHatasi ? err.mesaj : 'Eklenemedi.');
+    }
+  });
+
+  basla();
+</script>
+
+<style>
+  /* Sekmeler yalnızca dar ekranda */
+  .sekmeler { position: sticky; top: calc(68px + env(safe-area-inset-top)); z-index: 20; display: flex; background: var(--zemin); border-bottom: 1px solid var(--cizgi); }
+  .sekmeler button { flex: 1; min-height: 48px; font: inherit; font-size: 15px; font-weight: 600; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--soluk); cursor: pointer; }
+  .sekmeler button[aria-selected='true'] { color: var(--lacivert); border-bottom-color: var(--vurgu); }
+  .sayac:not(:empty) { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 999px; background: var(--vurgu); color: #fff; font-size: 12px; line-height: 20px; margin-left: 4px; }
+
+  .uygulama { max-width: 1400px; margin: 0 auto; }
+  .panel, .orta { padding: 16px 16px 24px; }
+  .uygulama[data-gorunen='orta'] .panel { display: none; }
+  .uygulama[data-gorunen='gecmis'] .orta, .uygulama[data-gorunen='gecmis'] .adimlar-panel { display: none; }
+  .uygulama[data-gorunen='adimlar'] .orta, .uygulama[data-gorunen='adimlar'] .gecmis { display: none; }
+
+  @media (min-width: 1100px) {
+    .sekmeler { display: none; }
+    .uygulama { display: grid; grid-template-columns: 270px minmax(0, 1fr) 320px; gap: 0; align-items: start; }
+    .uygulama .panel, .uygulama .orta { display: flex !important; }
+    .panel { position: sticky; top: 69px; max-height: calc(100dvh - 69px); overflow-y: auto; }
+    .gecmis { border-right: 1px solid var(--cizgi); }
+    .adimlar-panel { border-left: 1px solid var(--cizgi); }
+  }
+
+  .panel { flex-direction: column; gap: 12px; display: flex; }
+  .panel-ust { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .panel h2 { font-size: 20px; }
+  .kucuk-dugme { min-height: 40px; padding: 8px 14px; font-size: 14px; }
+  .kucuk { font-size: 14px; }
+
+  .sohbet-listesi, .adim-listesi { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .bos { padding: 12px 0; font-size: 15px; }
+  .sohbet-listesi li { display: flex; align-items: stretch; border-radius: 12px; background: var(--yuzey); border: 1px solid var(--cizgi); }
+  .sohbet-listesi li.secili { border-color: var(--lacivert); }
+  .sohbet-ac { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 10px 12px; font: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 2px; color: var(--murekkep); }
+  .sohbet-ac span { font-size: 15px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .sohbet-ac small { color: var(--soluk); font-size: 12px; }
+  .sil { background: none; border: 0; width: 44px; min-height: 44px; font-size: 22px; color: var(--soluk); cursor: pointer; flex-shrink: 0; }
+  .sil:hover { color: #a11; }
+  .hesap-baglanti { font-size: 15px; padding: 10px 0; }
+
+  .orta { display: flex; flex-direction: column; gap: 16px; min-height: calc(100dvh - 68px - 49px); }
+  @media (min-width: 1100px) { .orta { min-height: calc(100dvh - 69px); padding: 20px 32px 24px; } }
+  .serit { font-size: 13px; color: var(--soluk); background: #efede6; border-radius: 10px; padding: 8px 12px; line-height: 1.5; }
+  .karsilama { padding-top: 8px; }
+  .karsilama h1 { font-size: clamp(30px, 6vw, 46px); }
+  .alanlar { gap: 8px; }
+  .secim { font: inherit; font-size: 15px; min-height: 44px; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--cizgi-2); background: #fff; color: var(--murekkep); cursor: pointer; }
+  .secim[aria-pressed='true'] { background: var(--lacivert); color: #fff; border-color: var(--lacivert); }
+  .ornek { text-align: left; font: inherit; font-size: 15px; background: var(--yuzey); border: 1px dashed var(--cizgi-2); border-radius: 12px; padding: 12px 14px; cursor: pointer; color: var(--metin-2); min-height: 44px; }
+  .ornek:hover { border-color: var(--lacivert); color: var(--lacivert); }
+
+  .mesajlar { display: flex; flex-direction: column; gap: 14px; flex: 1; }
+  .mesajlar:empty { display: none; }
+  .balon { max-width: 100%; line-height: 1.6; font-size: 16px; scroll-margin-top: 130px; }
+  .balon.kullanici { align-self: flex-end; max-width: 88%; background: var(--lacivert); color: #fff; padding: 12px 16px; border-radius: 16px 16px 4px 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .balon.koc { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 4px 16px 16px 16px; padding: 14px 16px; }
+  .hata-balon { background: #fde8e8; color: #8a1c1c; border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+
+  .yaziyor { display: inline-flex; gap: 5px; padding: 6px 0; }
+  .yaziyor i { width: 8px; height: 8px; border-radius: 50%; background: var(--soluk); animation: zipla 1s infinite ease-in-out; }
+  .yaziyor i:nth-child(2) { animation-delay: 0.15s; }
+  .yaziyor i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes zipla { 0%, 80%, 100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+  @media (prefers-reduced-motion: reduce) { .yaziyor i { animation: none; opacity: 0.6; } }
+
+  .ek { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--cizgi); display: flex; flex-direction: column; gap: 8px; }
+  .oneri-adim { text-align: left; font: inherit; font-size: 15px; background: var(--zemin); border: 1px solid var(--cizgi-2); border-radius: 10px; padding: 10px 12px; min-height: 44px; cursor: pointer; color: var(--lacivert); font-weight: 500; }
+  .oneri-adim:disabled { color: #1d5a2c; background: #eef7f0; border-color: #cfe7d5; cursor: default; }
+  .hafiza-oneri { display: flex; flex-direction: column; gap: 8px; font-size: 15px; background: #f3f5fa; border-radius: 10px; padding: 10px 12px; }
+  .kucuk-secim { font: inherit; font-size: 14px; min-height: 40px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--cizgi-2); background: #fff; cursor: pointer; }
+
+  .yazma { position: sticky; bottom: 0; display: flex; gap: 10px; align-items: flex-end; background: var(--zemin); padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); margin-top: auto; border-top: 1px solid var(--cizgi); }
+  .yazma textarea { min-height: 52px; max-height: 220px; resize: none; font-size: 16px; padding: 13px 14px; border-radius: 14px; }
+  .gonder { width: 52px; height: 52px; min-height: 52px; padding: 0; border-radius: 14px; flex-shrink: 0; }
+  .gonder:disabled { opacity: 0.5; cursor: wait; }
+  .sayac-metin { font-size: 13px; text-align: right; margin-top: -10px; }
+
+  .adim-form { display: flex; gap: 8px; }
+  .adim-form input { min-height: 44px; padding: 10px 12px; font-size: 16px; }
+  .adim { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 12px; padding: 10px 6px 6px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .adim-onay { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 15px; line-height: 1.45; cursor: pointer; padding-right: 6px; }
+  .adim-onay input { width: 22px; height: 22px; margin: 0; flex-shrink: 0; accent-color: var(--lacivert); }
+  .adim.bitti .adim-onay span { text-decoration: line-through; color: var(--soluk); }
+  .adim-alt { display: flex; align-items: center; gap: 8px; padding-left: 32px; }
+  .adim-alt input[type='date'] { min-height: 36px; padding: 4px 8px; font-size: 14px; width: auto; border-radius: 8px; }
+  .gecikti { font-size: 12px; color: var(--vurgu-koyu); font-weight: 600; }
+  .adim-alt .sil { margin-left: auto; }
+</style>
+
+<style is:global>
+  .yazi-koc > * + * { margin-top: 0.7em; }
+  .yazi-koc h3 { font-family: var(--baslik); font-size: 18px; margin-top: 1em; color: var(--lacivert); }
+  .yazi-koc ul, .yazi-koc ol { padding-left: 1.3em; margin-bottom: 0; }
+  .yazi-koc li + li { margin-top: 0.3em; }
+  .yazi-koc blockquote { margin: 0; background: var(--zemin); border-radius: 10px; padding: 10px 14px; }
+  .yazi-koc strong { color: var(--murekkep); }
+</style>

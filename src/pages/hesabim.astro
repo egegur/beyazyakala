@@ -1,0 +1,191 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Hesabım" description="Profilin, notların, bildirimlerin ve verilerin." noindex>
+  <section class="kap hesap">
+    <div class="ust-sira">
+      <div class="yigin-kucuk">
+        <span class="ust-baslik">Hesabım</span>
+        <h1>Profilin ve verilerin</h1>
+        <p class="soluk" id="eposta-yazi">&nbsp;</p>
+      </div>
+      <a href="/koc/" class="dugme dugme-ana">Koça dön</a>
+    </div>
+
+    <form class="kart yigin" id="profil-form">
+      <div class="yigin-kucuk">
+        <h2>Profil</h2>
+        <p class="soluk kucuk">Koç önerilerini buna göre uyarlar. Hepsi isteğe bağlı; şirket adı veya kişisel bilgi yazmana gerek yok.</p>
+      </div>
+      <div class="izgara-form">
+        <div class="yigin-kucuk"><label for="p-rol">Rolün</label><input type="text" id="p-rol" maxlength="160" placeholder="ör. Kıdemli pazarlama uzmanı" /></div>
+        <div class="yigin-kucuk"><label for="p-sektor">Sektörün</label><input type="text" id="p-sektor" maxlength="160" placeholder="ör. Hızlı tüketim" /></div>
+        <div class="yigin-kucuk">
+          <label for="p-kidem">Toplam iş deneyimin</label>
+          <select id="p-kidem">
+            <option value="">Seç</option>
+            <option>1 yıldan az</option><option>1–3 yıl</option><option>3–5 yıl</option><option>5–10 yıl</option><option>10–15 yıl</option><option>15 yıldan fazla</option>
+          </select>
+        </div>
+        <div class="yigin-kucuk">
+          <label for="p-sirket">Şirket büyüklüğü</label>
+          <select id="p-sirket">
+            <option value="">Seç</option>
+            <option>1–29 çalışan</option><option>30–249 çalışan</option><option>250–999 çalışan</option><option>1000+ çalışan</option><option>Kamu</option>
+          </select>
+        </div>
+      </div>
+      <div class="yigin-kucuk"><label for="p-hedef">Şu anki hedefin</label><input type="text" id="p-hedef" maxlength="160" placeholder="ör. 6 ay içinde takım liderliğine geçmek" /></div>
+
+      <div class="yigin-kucuk ayrac">
+        <h2>E-posta bildirimleri</h2>
+        <label class="onay"><input type="checkbox" id="b-hatirlatma" /><span>Tarih verdiğim adımları o sabah e-postayla hatırlat</span></label>
+        <label class="onay"><input type="checkbox" id="b-haftalik" /><span>Pazartesi sabahları açık adımlarımın kısa özetini gönder</span></label>
+      </div>
+      <div class="sira">
+        <button type="submit" class="dugme dugme-ana">Kaydet</button>
+        <span class="soluk kucuk" id="profil-durum" role="status"></span>
+      </div>
+    </form>
+
+    <div class="kart yigin" id="hafiza">
+      <div class="yigin-kucuk">
+        <h2>Koçun hatırladıkları</h2>
+        <p class="soluk kucuk">Yalnızca senin onayladığın notlar. Koç her sohbette bunları dikkate alır. İstediğini silebilir veya yenisini ekleyebilirsin (en fazla 20).</p>
+      </div>
+      <ul class="not-listesi" id="not-listesi"><li class="soluk">Yükleniyor…</li></ul>
+      <form class="not-form" id="not-form">
+        <label for="not-girdi" class="gizli">Yeni not</label>
+        <input type="text" id="not-girdi" maxlength="200" placeholder="ör. Yöneticim yeni, 3 aydır birlikte çalışıyoruz" />
+        <button type="submit" class="dugme dugme-ikincil">Ekle</button>
+      </form>
+    </div>
+
+    <div class="kart yigin">
+      <h2>Verilerin</h2>
+      <p class="soluk kucuk">KVKK kapsamındaki haklarını buradan doğrudan kullanabilirsin. Ayrıntılar <a href="/kvkk/">aydınlatma metninde</a>.</p>
+      <div class="sira">
+        <a href="/api/verilerim" class="dugme dugme-ikincil" download>Tüm verilerimi indir (JSON)</a>
+        <button type="button" class="dugme dugme-ikincil" id="cikis">Çıkış yap</button>
+      </div>
+      <details class="sil-kutu">
+        <summary>Hesabımı ve tüm verilerimi sil</summary>
+        <div class="yigin">
+          <p>Hesabın, sohbetlerin, notların ve adımların <strong>kalıcı olarak</strong> silinir. Bu işlem geri alınamaz.</p>
+          <label for="sil-onay">Onaylamak için <strong>SİL</strong> yaz</label>
+          <input type="text" id="sil-onay" autocomplete="off" />
+          <button type="button" class="dugme sil-dugme" id="hesap-sil">Hesabımı kalıcı olarak sil</button>
+        </div>
+      </details>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { api, ApiHatasi, girisSayfasinaGit, kac } from '../lib/istemci';
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  if (!document.cookie.split(';').some((c) => c.trim() === 'by_g=1')) girisSayfasinaGit();
+
+  const alanlar: [string, string][] = [
+    ['rol', 'p-rol'],
+    ['sektor', 'p-sektor'],
+    ['kidem', 'p-kidem'],
+    ['sirket_buyuklugu', 'p-sirket'],
+    ['hedef', 'p-hedef']
+  ];
+
+  async function yukle() {
+    const ben = await api('/api/ben');
+    $('eposta-yazi').textContent = ben.eposta;
+    for (const [a, id] of alanlar) ($(id) as HTMLInputElement).value = ben.profil[a] ?? '';
+    $<HTMLInputElement>('b-hatirlatma').checked = ben.hatirlatma;
+    $<HTMLInputElement>('b-haftalik').checked = ben.haftalik;
+    notlariYukle();
+  }
+
+  async function notlariYukle() {
+    const { hafiza } = await api<{ hafiza: { id: string; metin: string }[] }>('/api/hafiza');
+    $('not-listesi').innerHTML = hafiza.length
+      ? hafiza.map((h) => `<li><span>${kac(h.metin)}</span><button type="button" class="sil" data-sil="${h.id}" aria-label="Notu sil">×</button></li>`).join('')
+      : '<li class="soluk">Henüz not yok. Koç sohbet sırasında hatırlamaya değer bir şey görürse sana sorar.</li>';
+  }
+
+  $('profil-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const profil: Record<string, string> = {};
+    for (const [a, id] of alanlar) profil[a] = ($(id) as HTMLInputElement).value.trim();
+    const d = $('profil-durum');
+    try {
+      await api('/api/profil', 'PUT', {
+        profil,
+        hatirlatma: $<HTMLInputElement>('b-hatirlatma').checked,
+        haftalik: $<HTMLInputElement>('b-haftalik').checked
+      });
+      d.textContent = '✓ Kaydedildi';
+      setTimeout(() => (d.textContent = ''), 3000);
+    } catch (err) {
+      d.textContent = err instanceof ApiHatasi ? err.mesaj : 'Kaydedilemedi.';
+    }
+  });
+
+  $('not-listesi').addEventListener('click', async (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-sil]');
+    if (!b) return;
+    await api(`/api/hafiza/${b.dataset.sil}`, 'DELETE');
+    notlariYukle();
+  });
+  $('not-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const g = $<HTMLInputElement>('not-girdi');
+    if (!g.value.trim()) return;
+    try {
+      await api('/api/hafiza', 'POST', { metin: g.value.trim() });
+      g.value = '';
+      notlariYukle();
+    } catch (err) {
+      alert(err instanceof ApiHatasi ? err.mesaj : 'Eklenemedi.');
+    }
+  });
+
+  $('cikis').addEventListener('click', async () => {
+    await api('/api/cikis', 'POST', {}).catch(() => {});
+    location.href = '/';
+  });
+  $('hesap-sil').addEventListener('click', async () => {
+    if ($<HTMLInputElement>('sil-onay').value.trim().toLocaleUpperCase('tr-TR') !== 'SİL') {
+      alert('Onaylamak için kutuya SİL yaz.');
+      return;
+    }
+    try {
+      await api('/api/hesap', 'DELETE');
+      alert('Hesabın ve tüm verilerin silindi.');
+      location.href = '/';
+    } catch (err) {
+      alert(err instanceof ApiHatasi ? err.mesaj : 'Silinemedi.');
+    }
+  });
+
+  yukle().catch(() => {});
+</script>
+
+<style>
+  .hesap { max-width: 760px; padding-top: 32px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 20px; }
+  .ust-sira { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; }
+  h1 { font-size: clamp(30px, 6vw, 44px); }
+  h2 { font-size: 22px; }
+  .kucuk { font-size: 14px; }
+  .izgara-form { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
+  select { background-image: linear-gradient(45deg, transparent 50%, var(--soluk) 50%), linear-gradient(135deg, var(--soluk) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 36px; }
+  .ayrac { border-top: 1px solid var(--cizgi); padding-top: 16px; }
+  .onay { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; font-size: 16px; cursor: pointer; padding: 4px 0; }
+  .onay input { width: 22px; height: 22px; margin: 2px 0 0; flex-shrink: 0; accent-color: var(--lacivert); }
+  .not-listesi { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .not-listesi li { display: flex; align-items: center; gap: 8px; background: var(--zemin); border-radius: 10px; padding: 4px 4px 4px 12px; font-size: 15px; min-height: 48px; }
+  .not-listesi li span { flex: 1; }
+  .sil { background: none; border: 0; width: 44px; height: 44px; font-size: 22px; color: var(--soluk); cursor: pointer; }
+  .not-form { display: flex; gap: 8px; }
+  .sil-kutu { border-top: 1px solid var(--cizgi); padding-top: 8px; }
+  .sil-kutu summary { cursor: pointer; color: #8a1c1c; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+  .sil-dugme { background: #8a1c1c; color: #fff; align-self: flex-start; }
+  .sil-dugme:hover { background: #6d1414; color: #fff; }
+</style>

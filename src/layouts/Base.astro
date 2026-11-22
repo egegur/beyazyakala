@@ -10,6 +10,7 @@ interface Props {
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
   aktif?: string;
+  altYok?: boolean;
 }
 
 const {
@@ -19,7 +20,8 @@ const {
   type = 'website',
   jsonLd = [],
   noindex = false,
-  aktif = ''
+  aktif = '',
+  altYok = false
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, SITE.url).href;
@@ -81,7 +83,7 @@ const ldListesi = [kurum, ...jsonLd];
         ))}
       </nav>
       <div class="ust-sag">
-        <a href="/demo/" class="dugme dugme-ana ust-cta">Demoyu dene</a>
+        <a href="/koc/" class="dugme dugme-ana ust-cta" data-girisli="Koçuma git">Koça başla</a>
         <details class="mobil-menu">
           <summary aria-label="Menüyü aç">
             <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -91,7 +93,8 @@ const ldListesi = [kurum, ...jsonLd];
             {NAV.map((n) => (
               <a href={n.href} aria-current={aktif === n.href ? 'page' : undefined}>{n.label}</a>
             ))}
-            <a href="/demo/" class="dugme dugme-ana dugme-tam">Demoyu dene</a>
+            <a href="/hesabim/" class="girisli-goster" hidden>Hesabım</a>
+            <a href="/koc/" class="dugme dugme-ana dugme-tam" data-girisli="Koçuma git">Koça başla</a>
           </nav>
         </details>
       </div>
@@ -102,7 +105,7 @@ const ldListesi = [kurum, ...jsonLd];
     <slot />
   </main>
 
-  <footer class="alt">
+  {!altYok && <footer class="alt">
     <div class="kap alt-ic">
       <div class="alt-marka">
         <img src="/img/logo-koyu.png" alt="Beyaz Yakala" width="140" height="45" loading="lazy" />
@@ -116,15 +119,23 @@ const ldListesi = [kurum, ...jsonLd];
           <a href="/fiyatlar/">Fiyatlar</a>
         </div>
         <div>
+          <a href="/koc/">Koç (beta)</a>
           <a href="/demo/">Demo</a>
+          <a href="/kvkk/">KVKK aydınlatma metni</a>
+          <a href="/kullanim-kosullari/">Kullanım koşulları</a>
           <a href="/gizlilik/">Gizlilik</a>
         </div>
       </nav>
     </div>
     <div class="kap alt-not">© 2026 Beyaz Yakala</div>
-  </footer>
+  </footer>}
 
   <script>
+    // Girişliyse üst menüdeki düğmeleri uyarla (by_g yalnızca arayüz işaretidir)
+    if (document.cookie.split(';').some((c) => c.trim() === 'by_g=1')) {
+      document.querySelectorAll<HTMLElement>('[data-girisli]').forEach((a) => (a.textContent = a.dataset.girisli!));
+      document.querySelectorAll<HTMLElement>('.girisli-goster').forEach((a) => (a.hidden = false));
+    }
     // Mobil menü: bir bağlantıya dokununca menüyü kapat (aynı sayfa içi #bağlantılar için)
     document.querySelectorAll('.mobil-panel a').forEach((a) => {
       a.addEventListener('click', () => {

@@ -1,0 +1,181 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Giriş yap" description="Beyaz Yakala koçuna e-posta adresinle, şifresiz giriş yap." noindex>
+  <section class="kap giris">
+    <div class="kart yigin" id="adim-eposta">
+      <span class="ust-baslik">Ücretsiz beta</span>
+      <h1>Koçuna giriş yap</h1>
+      <p class="soluk">Şifre yok. E-postana 6 haneli bir kod göndereceğiz. Hesabın yoksa otomatik açılır.</p>
+      <form id="form-eposta" class="yigin" novalidate>
+        <div class="yigin-kucuk">
+          <label for="eposta">E-posta adresin</label>
+          <input type="email" id="eposta" name="eposta" autocomplete="email" inputmode="email" required placeholder="ad@ornek.com" />
+        </div>
+        <label class="onay">
+          <input type="checkbox" id="riza-kvkk" />
+          <span><a href="/kvkk/" target="_blank" rel="noopener">Aydınlatma metnini</a> ve <a href="/kullanim-kosullari/" target="_blank" rel="noopener">kullanım koşullarını</a> okudum.</span>
+        </label>
+        <label class="onay">
+          <input type="checkbox" id="riza-yurtdisi" />
+          <span>Yazdıklarımın yanıt üretmek için yurt dışındaki hizmet sağlayıcılara (Anthropic, Cloudflare, Resend) aktarılmasına <strong>açık rıza</strong> veriyorum.</span>
+        </label>
+        <div id="turnstile" class="turnstile" hidden></div>
+        <p class="hata" id="hata-eposta" role="alert" hidden></p>
+        <button type="submit" class="dugme dugme-ana dugme-tam" id="dugme-eposta">Kodu gönder</button>
+        <p class="soluk kucuk">Daha önce giriş yaptıysan onay kutuları seni etkilemez; yeni hesap açarken gereklidir.</p>
+      </form>
+    </div>
+
+    <div class="kart yigin" id="adim-kod" hidden>
+      <h1>Kodu yaz</h1>
+      <p class="soluk"><strong id="kod-eposta"></strong> adresine 6 haneli bir kod gönderdik. Gelen kutunda yoksa spam/gereksiz klasörüne bak.</p>
+      <form id="form-kod" class="yigin" novalidate>
+        <div class="yigin-kucuk">
+          <label for="kod">Giriş kodu</label>
+          <input type="text" id="kod" name="kod" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" required class="kod-kutu" placeholder="••••••" />
+        </div>
+        <p class="hata" id="hata-kod" role="alert" hidden></p>
+        <button type="submit" class="dugme dugme-ana dugme-tam" id="dugme-kod">Giriş yap</button>
+      </form>
+      <div class="sira">
+        <button type="button" class="baglanti" id="tekrar">Kodu tekrar gönder</button>
+        <button type="button" class="baglanti" id="geri">E-postayı değiştir</button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { api, ApiHatasi, guvenliHedef } from '../lib/istemci';
+
+  const hedef = guvenliHedef(new URLSearchParams(location.search).get('d'));
+  if (document.cookie.split(';').some((c) => c.trim() === 'by_g=1')) {
+    // Zaten girişliyse doğrula ve yönlendir
+    api('/api/ben').then(() => location.replace(hedef)).catch(() => {});
+  }
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const epostaGir = $<HTMLInputElement>('eposta');
+  const kodGir = $<HTMLInputElement>('kod');
+  let eposta = '';
+  let turnstileToken = '';
+
+  function hataGoster(id: string, m: string | null) {
+    const el = $(id);
+    el.textContent = m ?? '';
+    el.hidden = !m;
+  }
+
+  // Turnstile (yapılandırıldıysa)
+  api<{ turnstile: string | null }>('/api/durum')
+    .then((d) => {
+      if (!d.turnstile) return;
+      const kutu = $('turnstile');
+      kutu.hidden = false;
+      (window as any).turnstileHazir = () => {
+        (window as any).turnstile.render(kutu, {
+          sitekey: d.turnstile,
+          language: 'tr',
+          callback: (t: string) => (turnstileToken = t)
+        });
+      };
+      const s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileHazir&render=explicit';
+      s.async = true;
+      document.head.appendChild(s);
+    })
+    .catch(() => {});
+
+  async function kodIste(dugme: HTMLButtonElement) {
+    hataGoster('hata-eposta', null);
+    eposta = epostaGir.value.trim();
+    if (!/^\S+@\S+\.\S{2,}$/.test(eposta)) return hataGoster('hata-eposta', 'Geçerli bir e-posta adresi yaz.');
+    dugme.disabled = true;
+    const eski = dugme.textContent;
+    dugme.textContent = 'Gönderiliyor…';
+    try {
+      await api('/api/giris/kod', 'POST', {
+        eposta,
+        rizaKvkk: $<HTMLInputElement>('riza-kvkk').checked,
+        rizaYurtdisi: $<HTMLInputElement>('riza-yurtdisi').checked,
+        turnstile: turnstileToken
+      });
+      $('kod-eposta').textContent = eposta;
+      $('adim-eposta').hidden = true;
+      $('adim-kod').hidden = false;
+      kodGir.value = '';
+      kodGir.focus();
+      return true;
+    } catch (e) {
+      const m = e instanceof ApiHatasi ? e.mesaj : 'Bir hata oldu.';
+      if (!$('adim-kod').hidden) hataGoster('hata-kod', m);
+      else hataGoster('hata-eposta', m);
+      (window as any).turnstile?.reset?.();
+      return false;
+    } finally {
+      dugme.disabled = false;
+      dugme.textContent = eski;
+    }
+  }
+
+  $('form-eposta').addEventListener('submit', (e) => {
+    e.preventDefault();
+    kodIste($<HTMLButtonElement>('dugme-eposta'));
+  });
+
+  $('form-kod').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hataGoster('hata-kod', null);
+    const kod = kodGir.value.replace(/\D/g, '');
+    if (kod.length !== 6) return hataGoster('hata-kod', 'Kod 6 rakamdan oluşur.');
+    const dugme = $<HTMLButtonElement>('dugme-kod');
+    dugme.disabled = true;
+    dugme.textContent = 'Kontrol ediliyor…';
+    try {
+      const r = await api<{ yeni: boolean }>('/api/giris/dogrula', 'POST', {
+        eposta,
+        kod,
+        rizaKvkk: $<HTMLInputElement>('riza-kvkk').checked,
+        rizaYurtdisi: $<HTMLInputElement>('riza-yurtdisi').checked
+      });
+      location.replace(r.yeni && hedef === '/koc/' ? '/koc/?hosgeldin=1' : hedef);
+    } catch (e) {
+      hataGoster('hata-kod', e instanceof ApiHatasi ? e.mesaj : 'Bir hata oldu.');
+      dugme.disabled = false;
+      dugme.textContent = 'Giriş yap';
+    }
+  });
+
+  kodGir.addEventListener('input', () => {
+    kodGir.value = kodGir.value.replace(/\D/g, '').slice(0, 6);
+    if (kodGir.value.length === 6) $('form-kod').requestSubmit();
+  });
+
+  $('tekrar').addEventListener('click', async (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    hataGoster('hata-kod', null);
+    if (await kodIste(b)) {
+      b.textContent = 'Yeni kod gönderildi';
+      setTimeout(() => (b.textContent = 'Kodu tekrar gönder'), 4000);
+    }
+  });
+  $('geri').addEventListener('click', () => {
+    $('adim-kod').hidden = true;
+    $('adim-eposta').hidden = false;
+    epostaGir.focus();
+  });
+</script>
+
+<style>
+  .giris { max-width: 520px; padding-top: 32px; padding-bottom: 72px; }
+  @media (min-width: 768px) { .giris { padding-top: 64px; } }
+  h1 { font-size: clamp(30px, 6vw, 42px); }
+  .onay { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; font-size: 15px; line-height: 1.5; color: var(--metin-2); cursor: pointer; }
+  .onay input { width: 22px; height: 22px; margin: 1px 0 0; flex-shrink: 0; accent-color: var(--lacivert); }
+  .kod-kutu { font-size: 28px; letter-spacing: 10px; text-align: center; font-weight: 700; }
+  .hata { background: #fde8e8; color: #8a1c1c; border-radius: 10px; padding: 12px 14px; font-size: 15px; }
+  .kucuk { font-size: 14px; }
+  .baglanti { background: none; border: 0; padding: 10px 0; min-height: 44px; font: inherit; font-size: 15px; color: var(--lacivert); text-decoration: underline; cursor: pointer; }
+  .turnstile { min-height: 65px; }
+</style>

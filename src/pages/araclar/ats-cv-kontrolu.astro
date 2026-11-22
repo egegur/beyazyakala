@@ -1,16 +1,28 @@
 ---
 import Base from '../../layouts/Base.astro';
 ---
-<Base title="ATS CV ön kontrolü" description="ATS nedir, CV'n başvuru sistemlerinden neden elenebilir? Yakında açılacak ücretsiz ATS CV ön kontrolü ve bugünden uygulayabileceğin ipuçları." aktif="/araclar/">
+<Base title="ATS CV ön kontrolü" description="CV'nin aday takip sistemlerinde (ATS) ne kadar okunabilir olduğuna ücretsiz özet puan al; ilan eklersen eksik anahtar kavramları gör." aktif="/araclar/">
   <section class="kap duzen">
-    <div class="yigin">
-      <span class="ust-baslik">Ücretsiz araç · Yakında</span>
+    <form class="yigin" id="form" novalidate>
+      <span class="ust-baslik">Ücretsiz araç · Beta</span>
       <h1>ATS CV ön kontrolü</h1>
-      <p class="aciklama">Pek çok şirket başvuruları önce bir aday takip sisteminden (ATS) geçirir. Bu araç, CV'nin bu sistemlerde ne kadar okunabilir olduğuna özet bir puan verecek.</p>
-      <p class="uyari-kutu">Bu araç henüz açılmadı. O zamana kadar aşağıdaki kontrolleri kendin yapabilirsin.</p>
-    </div>
-    <div class="kart yigin">
-      <h2 class="kucuk-baslik">CV'ni bugün kontrol et</h2>
+      <p class="aciklama">Pek çok şirket başvuruları önce bir aday takip sisteminden (ATS) geçirir. CV metnini yapıştır; okunabilirliğe özet bir puan, sorunlar ve düzeltme önerileri al.</p>
+      <div class="yigin-kucuk">
+        <label for="cv">CV metnin</label>
+        <textarea id="cv" rows="10" maxlength="15000" placeholder="CV dosyanı aç, tüm metni seçip kopyala (Ctrl/Cmd + A, C) ve buraya yapıştır."></textarea>
+        <span class="soluk kucuk">TC kimlik no, adres, telefon gibi bilgileri silip yapıştırabilirsin; değerlendirmeyi etkilemez.</span>
+      </div>
+      <div class="yigin-kucuk">
+        <label for="ilan">İş ilanı (isteğe bağlı)</label>
+        <textarea id="ilan" rows="5" maxlength="6000" placeholder="Başvuracağın ilanın metnini yapıştırırsan eksik anahtar kavramları da gösteririz."></textarea>
+      </div>
+      <p class="hata" id="hata" role="alert" hidden></p>
+      <button type="submit" class="dugme dugme-ana" id="dugme">CV'mi kontrol et</button>
+      <p class="soluk kucuk">Metnin değerlendirme için yapay zekâ hizmet sağlayıcımıza (Anthropic) iletilir; bizde saklanmaz, Anthropic en geç 30 gün içinde siler ve model eğitiminde kullanmaz. Puan bir tahmindir; her ATS farklı çalışır. <a href="/kvkk/">Ayrıntılar</a></p>
+    </form>
+
+    <div class="kart yigin sonuc" id="sonuc" aria-live="polite">
+      <h2 class="kucuk-baslik">Beklerken: CV'ni bugün kontrol et</h2>
       <ol class="liste">
         <li>Başlıkları sade tut: Deneyim, Eğitim, Beceriler.</li>
         <li>Tablo, metin kutusu ve sütunlu düzenlerden kaçın; bazı sistemler bunları okuyamaz.</li>
@@ -18,17 +30,74 @@ import Base from '../../layouts/Base.astro';
         <li>Tarihleri tutarlı bir biçimde yaz (ör. 03/2022 – 11/2026).</li>
         <li>Dosyayı ilanda istenen biçimde gönder; belirtilmemişse metin seçilebilen bir PDF genellikle güvenlidir.</li>
       </ol>
-      <a href="/blog/terfi-dosyasi-nasil-hazirlanir/" class="sonraki">Kazanımlarını nasıl yazacağını blogda anlattık →</a>
     </div>
   </section>
 </Base>
+
+<script>
+  import { kac } from '../../lib/istemci';
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  $('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const cv = $<HTMLTextAreaElement>('cv').value.trim();
+    const ilan = $<HTMLTextAreaElement>('ilan').value.trim();
+    const hata = $('hata');
+    hata.hidden = true;
+    if (cv.length < 200) {
+      hata.textContent = "CV metnin çok kısa görünüyor. CV'nin tamamını yapıştır.";
+      hata.hidden = false;
+      return;
+    }
+    const d = $<HTMLButtonElement>('dugme');
+    d.disabled = true;
+    d.textContent = 'İnceleniyor… (20 sn kadar sürebilir)';
+    $('sonuc').innerHTML = '<p class="soluk">CV\'n inceleniyor…</p>';
+    try {
+      const r = await fetch('/api/arac/ats', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ cv, ilan })
+      });
+      const v = await r.json();
+      if (!r.ok) throw new Error(v.hata || 'Bir hata oldu.');
+      const s = v.sonuc;
+      const puan = Math.max(0, Math.min(100, Number(s.puan) || 0));
+      const renk = puan >= 75 ? '#1d5a2c' : puan >= 50 ? '#8a5a00' : '#8a1c1c';
+      const liste = (x: unknown) => (Array.isArray(x) ? x : []);
+      $('sonuc').innerHTML = `
+        <div class="puan-kutu"><span class="puan-sayi" style="color:${renk}">${puan}</span><span class="soluk">/ 100 ATS uyum puanı</span></div>
+        <p>${kac(String(s.ozet ?? ''))}</p>
+        ${liste(s.guclu).length ? `<div class="yigin-kucuk"><span class="etiket">Güçlü yanlar</span><ul class="liste">${liste(s.guclu).map((g: any) => `<li>${kac(String(g))}</li>`).join('')}</ul></div>` : ''}
+        ${liste(s.sorunlar).length ? `<div class="yigin-kucuk"><span class="etiket">Düzeltilecekler</span>${liste(s.sorunlar).map((x: any) => `<div class="sorun"><strong>${kac(String(x.baslik ?? ''))}</strong><p>${kac(String(x.aciklama ?? ''))}</p><p class="oneri">→ ${kac(String(x.oneri ?? ''))}</p></div>`).join('')}</div>` : ''}
+        ${liste(s.eksik_kelimeler).length ? `<div class="yigin-kucuk"><span class="etiket">İlanda olup CV'nde olmayan kavramlar</span><div class="sira kelimeler">${liste(s.eksik_kelimeler).map((k: any) => `<span class="kelime">${kac(String(k))}</span>`).join('')}</div><p class="soluk kucuk">Yalnızca gerçekten sahip olduğun deneyimleri ekle.</p></div>` : ''}
+        <a href="/koc/" class="sonraki">Başvuru, mülakat veya iş değişikliği için koçla plan yap →</a>`;
+      if (window.innerWidth < 900) $('sonuc').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      $('sonuc').innerHTML = `<p class="hata">${kac((err as Error).message)}</p>`;
+    } finally {
+      d.disabled = false;
+      d.textContent = "CV'mi kontrol et";
+    }
+  });
+</script>
 
 <style>
   .duzen { display: grid; gap: 32px; padding-top: 32px; padding-bottom: 72px; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); align-items: start; }
   @media (min-width: 768px) { .duzen { padding-top: 56px; } }
   h1 { font-size: clamp(32px, 6vw, 52px); }
+  .kucuk { font-size: 14px; }
+  .hata { background: #fde8e8; color: #8a1c1c; border-radius: 10px; padding: 12px 14px; font-size: 15px; }
   .kucuk-baslik { font-size: 22px; }
-  .liste { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; color: var(--metin-2); }
-  .sonraki { display: block; text-decoration: none; background: var(--lacivert); color: #fff; padding: 16px 18px; border-radius: 12px; font-weight: 600; }
-  .sonraki:hover { color: #fff; }
+  .sonuc { scroll-margin-top: 90px; }
+  .sonuc :global(.liste) { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; color: var(--metin-2); }
+  .sonuc :global(.puan-kutu) { display: flex; align-items: baseline; gap: 8px; }
+  .sonuc :global(.puan-sayi) { font-family: var(--baslik); font-size: 56px; font-weight: 800; line-height: 1; }
+  .sonuc :global(.sorun) { border: 1px solid var(--cizgi); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+  .sonuc :global(.oneri) { color: var(--lacivert); font-weight: 500; }
+  .sonuc :global(.kelimeler) { gap: 6px; }
+  .sonuc :global(.kelime) { background: var(--vurgu-zemin); color: var(--vurgu-koyu); border-radius: 999px; padding: 4px 12px; font-size: 14px; font-weight: 600; }
+  .sonuc :global(.sonraki) { display: block; text-decoration: none; background: var(--lacivert); color: #fff; padding: 16px 18px; border-radius: 12px; font-weight: 600; }
+  .sonuc :global(.sonraki:hover) { color: #fff; }
+  .sonuc :global(.hata) { background: #fde8e8; color: #8a1c1c; border-radius: 10px; padding: 12px 14px; }
 </style>

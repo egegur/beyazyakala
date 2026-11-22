@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 ---
 <Base title="Koç demosu: Durumunu anlat" description="Beyaz Yakala koçunun nasıl çalışacağını örnek bir durum üzerinden adım adım gör: anlat, netleştir, harekete geç.">
   <section class="kap demo">
-    <p class="demo-serit">Bu bir tanıtım demosudur. Koç geliştirme aşamasında; aşağıdaki örnek konuşma ile nasıl çalışacağını görebilirsin.</p>
+    <p class="demo-serit">Bu, örnek bir konuşmadır. Gerçek koç ücretsiz beta olarak açık: <a href="/koc/">kendi durumunu anlatmak için buraya dokun</a>.</p>
 
     <div id="adim0" class="yigin">
       <h1>Ne oluyor? Anlat.</h1>
@@ -11,7 +11,7 @@ import Base from '../layouts/Base.astro';
       <label class="gizli" for="durum">Durumunu anlat</label>
       <textarea id="durum" rows="5" readonly>Yöneticim üzerinde aylardır çalıştığım projeyi son dakika başka birine verdi. Haftaya birebirimiz var, nasıl konuşmalıyım?</textarea>
       <div class="sira" style="justify-content: space-between">
-        <span class="soluk kucuk">Demoda örnek metin kullanılıyor.</span>
+        <span class="soluk kucuk">Demoda örnek metin kullanılıyor. <a href="/koc/">Kendi durumunu yaz →</a></span>
         <button type="button" class="dugme dugme-ana" id="gonder">Koça gönder</button>
       </div>
     </div>
@@ -83,14 +83,14 @@ import Base from '../layouts/Base.astro';
           <li>Görüşmeden bir gün önce açılış cümleni prova et.</li>
         </ol>
         <button type="button" class="dugme dugme-ikincil" id="hatirlat" style="align-self: flex-start">Hatırlatma ekle</button>
-        <p class="soluk kucuk" id="hatirlat-not" hidden>Koç açıldığında, birebirden bir gün önce sabah hatırlatma gönderecek.</p>
+        <p class="soluk kucuk" id="hatirlat-not" hidden>Gerçek koçta adımlarına tarih verip o sabah e-posta hatırlatması alabilirsin.</p>
       </div>
 
       <div class="son-kutu yigin">
-        <h2>Koç açıldığında ilk sen dene</h2>
-        <p>Şimdilik ücretsiz araçları ve şablonları kullanabilirsin.</p>
+        <h2>Şimdi kendi durumunla dene</h2>
+        <p>Koç ücretsiz beta olarak açık. E-postanla şifresiz giriş yap, durumunu anlat.</p>
         <div class="sira">
-          <a href="/sablonlar/yoneticiye-geri-bildirim-mesaji/" class="dugme dugme-beyaz">Şablonlara git</a>
+          <a href="/koc/" class="dugme dugme-beyaz">Koça başla</a>
           <button type="button" class="dugme dugme-ikincil-koyu" id="basa">Demoyu baştan oynat</button>
         </div>
       </div>

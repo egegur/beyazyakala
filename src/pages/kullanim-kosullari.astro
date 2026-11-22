@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import { VERI_SORUMLUSU as V } from '../data/site';
+---
+<Base title="Kullanım koşulları" description="Beyaz Yakala ücretsiz beta kullanım koşulları.">
+  <article class="kap metin">
+    <h1>Kullanım koşulları</h1>
+    <p class="soluk">Sürüm: {V.surum} · Ücretsiz beta</p>
+
+    <h2>1. Hizmet</h2>
+    <p>Beyaz Yakala, Türkçe konuşan bir yapay zekâ kariyer koçu ve ücretsiz kariyer araçları sunar. Hizmet şu an <strong>ücretsiz beta</strong> aşamasındadır: özellikler değişebilir, kesintiler yaşanabilir ve günlük kullanım sınırları uygulanır. Beta süresince senden ücret alınmaz; ücretli paketler başladığında önceden haber verilir ve onayın olmadan ücret alınmaz.</p>
+
+    <h2>2. Yapay zekâ ve sorumluluk</h2>
+    <ul>
+      <li>Koçun yanıtları yapay zekâ tarafından otomatik üretilir; eksik, hatalı veya güncel olmayan bilgi içerebilir.</li>
+      <li>Koç; avukat, mali müşavir, doktor, psikolog veya insan koç değildir ve onların yerine geçmez. Hukuki haklar, fesih, tazminat ve mobbing gibi konularda bir iş hukuku avukatına veya ALO 170'e danış.</li>
+      <li>Koçun önerilerine göre alacağın kararlar senin sorumluluğundadır. Hizmet "olduğu gibi" sunulur; yanıtların doğruluğu veya belirli bir sonuç (zam, terfi, iş teklifi vb.) garanti edilmez.</li>
+      <li>Kendine veya başkasına zarar verme düşüncesi gibi acil durumlarda koç uygun bir kaynak değildir: <strong>112'yi ara</strong>.</li>
+    </ul>
+
+    <h2>3. Hesabın</h2>
+    <ul>
+      <li>Hesabın kişiseldir; e-posta adresine erişimini güvende tutmak senin sorumluluğundadır.</li>
+      <li>18 yaşından küçüksen hizmeti kullanmamalısın.</li>
+      <li>Hesabını ve tüm verilerini istediğin zaman Hesabım sayfasından silebilirsin.</li>
+    </ul>
+
+    <h2>4. Kabul edilemez kullanım</h2>
+    <p>Hizmeti; yasa dışı işler, sahte belge veya yanıltıcı içerik üretmek, başkalarını taciz etmek veya zarar vermek, başkalarının kişisel verilerini izinsiz işlemek, sistemi otomatik araçlarla yüklemek ya da sınırları aşmaya çalışmak için kullanamazsın. Bu durumlarda hesabın askıya alınabilir veya silinebilir.</p>
+
+    <h2>5. İçerik</h2>
+    <p>Koça yazdıkların sana aittir. Koçun ürettiği taslakları (e-posta, konuşma metni vb.) dilediğin gibi kullanabilirsin. Verilerinin nasıl işlendiği <a href="/kvkk/">KVKK aydınlatma metninde</a> anlatılır.</p>
+
+    <h2>6. Değişiklikler ve iletişim</h2>
+    <p>Bu koşullar güncellenebilir; önemli değişiklikleri sitede duyururuz. Sorular için: <a href={`mailto:${V.eposta}`}>{V.eposta}</a>.</p>
+  </article>
+</Base>
+
+<style>
+  .metin { max-width: 760px; padding-top: 48px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 14px; }
+  h1 { font-size: clamp(30px, 5.5vw, 44px); }
+  h2 { font-size: clamp(21px, 3.5vw, 26px); margin-top: 18px; }
+  .metin p, .metin li { color: var(--metin-2); }
+  .metin ul { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 8px; }
+</style>
